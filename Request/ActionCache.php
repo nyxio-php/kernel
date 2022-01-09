@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Request;
+namespace Nyxio\Kernel\Request;
 
-use Nyx\Contract\Http\MiddlewareInterface;
-use Nyx\Routing\Attribute\Route;
+use Nyxio\Contract\Http\MiddlewareInterface;
+use Nyxio\Routing\Attribute\Route;
 
 class ActionCache
 {

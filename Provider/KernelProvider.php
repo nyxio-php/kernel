@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Provider;
+namespace Nyxio\Kernel\Provider;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyx\Event;
-use Nyx\Http;
-use Nyx\Kernel;
-use Nyx\Provider;
-use Nyx\Routing;
-use Nyx\Validation;
+use Nyxio\Event;
+use Nyxio\Http;
+use Nyxio\Kernel;
+use Nyxio\Provider;
+use Nyxio\Routing;
+use Nyxio\Validation;
+use Nyxio\Contract;
 use Psr\Http\Message;
 
-class KernelProvider implements \Nyx\Contract\Provider\ProviderInterface
+class KernelProvider implements Contract\Provider\ProviderInterface
 {
     public function __construct(
-        private readonly \Nyx\Contract\Container\ContainerInterface $container,
-        private readonly \Nyx\Contract\Config\ConfigInterface $config
+        private readonly Contract\Container\ContainerInterface $container,
+        private readonly Contract\Config\ConfigInterface $config
     ) {
     }
 
@@ -34,25 +35,25 @@ class KernelProvider implements \Nyx\Contract\Provider\ProviderInterface
     private function validation(): void
     {
         $this->container->singleton(
-            \Nyx\Contract\Validation\RuleExecutorCollectionInterface::class,
+            Contract\Validation\RuleExecutorCollectionInterface::class,
             Validation\RuleExecutorCollection::class,
         );
 
         $this->container->singleton(
-            \Nyx\Contract\Validation\Handler\RulesCheckerInterface::class,
+            Contract\Validation\Handler\RulesCheckerInterface::class,
             Validation\Handler\RulesChecker::class
         );
 
         $this->container->bind(
-            \Nyx\Contract\Validation\Handler\ValidatorCollectionInterface::class,
+            Contract\Validation\Handler\ValidatorCollectionInterface::class,
             Validation\Handler\ValidatorCollection::class
         );
     }
 
     private function routing(): void
     {
-        $this->container->singleton(\Nyx\Contract\Routing\GroupCollectionInterface::class, Routing\GroupCollection::class);
-        $this->container->bind(\Nyx\Contract\Routing\UriMatcherInterface::class, Routing\UriMatcher::class);
+        $this->container->singleton(Contract\Routing\GroupCollectionInterface::class, Routing\GroupCollection::class);
+        $this->container->bind(Contract\Routing\UriMatcherInterface::class, Routing\UriMatcher::class);
     }
 
     // PSR-17: Factories
@@ -70,35 +71,35 @@ class KernelProvider implements \Nyx\Contract\Provider\ProviderInterface
         $this->container->singleton(Kernel\Application::class);
 
         $this->container->singleton(
-            \Nyx\Contract\Kernel\Request\ActionCollectionInterface::class,
+            Contract\Kernel\Request\ActionCollectionInterface::class,
             Kernel\Request\ActionCollection::class
         );
 
         $this->container
             ->singleton(
-                \Nyx\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface::class,
+                Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface::class,
                 Kernel\Exception\Transformer\ExceptionTransformer::class
             )
             ->addArgument('debug', $this->config->get('app.debug', false));
 
         $this->container->singleton(
-            \Nyx\Contract\Kernel\Request\RequestHandlerInterface::class,
+            Contract\Kernel\Request\RequestHandlerInterface::class,
             Kernel\Request\RequestHandler::class
         );
 
-        $this->container->singleton(\Nyx\Contract\Provider\ProviderDispatcherInterface::class, Provider\Dispatcher::class);
-        $this->container->singleton(\Nyx\Contract\Event\EventDispatcherInterface::class, Event\Dispatcher::class);
+        $this->container->singleton(Contract\Provider\ProviderDispatcherInterface::class, Provider\Dispatcher::class);
+        $this->container->singleton(Contract\Event\EventDispatcherInterface::class, Event\Dispatcher::class);
     }
 
     private function bootstrap(): void
     {
-        $this->container->get(\Nyx\Contract\Validation\RuleExecutorCollectionInterface::class)->register(Validation\DefaultRules::class);
+        $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)->register(Validation\DefaultRules::class);
 
         foreach ($this->config->get('http.groups', []) as $group) {
-            $this->container->get(\Nyx\Contract\Routing\GroupCollectionInterface::class)->register($group);
+            $this->container->get(Contract\Routing\GroupCollectionInterface::class)->register($group);
         }
 
-        $this->container->get(\Nyx\Contract\Kernel\Request\ActionCollectionInterface::class)
+        $this->container->get(Contract\Kernel\Request\ActionCollectionInterface::class)
             ->create($this->config->get('http.actions', []));
 
     }

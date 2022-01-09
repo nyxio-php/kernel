@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel;
+namespace Nyxio\Kernel;
 
-use Nyx\Config\MemoryConfig;
-use Nyx\Container\Container;
-use Nyx\Contract\Config\ConfigInterface;
-use Nyx\Contract\Container\ContainerInterface;
-use Nyx\Contract\Provider\ProviderDispatcherInterface;
-use Nyx\Provider\Dispatcher;
+use Nyxio\Config\MemoryConfig;
+use Nyxio\Container\Container;
+use Nyxio\Contract\Config\ConfigInterface;
+use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Provider\ProviderDispatcherInterface;
+use Nyxio\Provider\Dispatcher;
 
 class Application
 {

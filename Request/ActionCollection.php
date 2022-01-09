@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Request;
+namespace Nyxio\Kernel\Request;
 
-use Nyx\Contract\Container\ContainerInterface;
-use Nyx\Contract\Kernel\Request\ActionCollectionInterface;
-use Nyx\Contract\Routing\GroupCollectionInterface;
-use Nyx\Helper\Attribute\ExtractAttribute;
-use Nyx\Routing\Attribute\Middleware;
-use Nyx\Routing\Attribute\Route;
-use Nyx\Routing\Attribute\RouteGroup;
-use Nyx\Validation\Attribute\Validation;
+use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Kernel\Request\ActionCollectionInterface;
+use Nyxio\Contract\Routing\GroupCollectionInterface;
+use Nyxio\Helper\Attribute\ExtractAttribute;
+use Nyxio\Routing\Attribute\Middleware;
+use Nyxio\Routing\Attribute\Route;
+use Nyxio\Routing\Attribute\RouteGroup;
+use Nyxio\Validation\Attribute\Validation;
 
-use function Nyx\Helper\Reflection\getMethodParametersNames;
+use function Nyxio\Helper\Reflection\getMethodParametersNames;
 
 class ActionCollection implements ActionCollectionInterface
 {

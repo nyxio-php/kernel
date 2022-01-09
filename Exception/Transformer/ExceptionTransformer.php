@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Exception\Transformer;
+namespace Nyxio\Kernel\Exception\Transformer;
 
-use Nyx\Contract\Http\HttpStatus;
-use Nyx\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
-use Nyx\Http\Exception\HttpException;
+use Nyxio\Contract\Http\HttpStatus;
+use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
+use Nyxio\Http\Exception\HttpException;
 
 class ExceptionTransformer implements ExceptionTransformerInterface
 {

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Request;
+namespace Nyxio\Kernel\Request;
 
-use Nyx\Contract\Container\ContainerInterface;
-use Nyx\Contract\Http\ContentType;
-use Nyx\Contract\Http\HttpStatus;
-use Nyx\Contract\Http\MiddlewareInterface;
-use Nyx\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
-use Nyx\Contract\Kernel\Request\ActionCollectionInterface;
-use Nyx\Contract\Kernel\Request\RequestHandlerInterface;
-use Nyx\Contract\Routing\UriMatcherInterface;
-use Nyx\Http\Exception\HttpException;
-use Nyx\Http\Request;
-use Nyx\Http\Response;
+use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Http\ContentType;
+use Nyxio\Contract\Http\HttpStatus;
+use Nyxio\Contract\Http\MiddlewareInterface;
+use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
+use Nyxio\Contract\Kernel\Request\ActionCollectionInterface;
+use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
+use Nyxio\Contract\Routing\UriMatcherInterface;
+use Nyxio\Http\Exception\HttpException;
+use Nyxio\Http\Request;
+use Nyxio\Http\Response;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

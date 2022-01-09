@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel;
+namespace Nyxio\Kernel;
 
-use Nyx\Contract\Kernel\Request\RequestHandlerInterface;
-use Nyx\Contract\Server\HandlerInterface;
+use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
+use Nyxio\Contract\Server\HandlerInterface;
 
 class ServerBridge
 {

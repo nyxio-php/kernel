@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Nyx\Kernel\Provider;
+namespace Nyxio\Kernel\Provider;
 
-use Nyx\Contract\Container\ContainerInterface;
-use Nyx\Contract\Provider\ProviderInterface;
-use Nyx\Contract\Server\HandlerInterface;
-use Nyx\Server\WorkermanHandler;
+use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Provider\ProviderInterface;
+use Nyxio\Contract\Server\HandlerInterface;
+use Nyxio\Server\WorkermanHandler;
 
 class WorkermanProvider implements ProviderInterface
 {

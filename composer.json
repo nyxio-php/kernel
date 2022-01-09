@@ -1,11 +1,11 @@
 {
-    "name": "nyx/kernel",
-    "description": "NYX Kernel component",
+    "name": "nyxio/kernel",
+    "description": "nyxio kernel component",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Nyx\\Kernel\\": ""
+            "Nyxio\\Kernel\\": ""
         }
     },
     "authors": [
@@ -17,15 +17,15 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
-        "nyx/contract": "dev-main",
-        "nyx/http": "dev-main",
-        "nyx/provider": "dev-main",
-        "nyx/event": "dev-main",
-        "nyx/routing": "dev-main",
-        "nyx/validation": "dev-main",
-        "nyx/server": "dev-main",
-        "nyx/helper": "dev-main",
-        "nyx/config": "dev-main",
-        "nyx/container": "dev-main"
+        "nyxio/contract": "dev-main",
+        "nyxio/http": "dev-main",
+        "nyxio/provider": "dev-main",
+        "nyxio/event": "dev-main",
+        "nyxio/routing": "dev-main",
+        "nyxio/validation": "dev-main",
+        "nyxio/server": "dev-main",
+        "nyxio/helper": "dev-main",
+        "nyxio/config": "dev-main",
+        "nyxio/container": "dev-main"
     }
 }
