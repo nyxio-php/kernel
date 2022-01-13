@@ -39,8 +39,8 @@ class RequestHandler implements RequestHandlerInterface
         try {
             foreach ($this->actionCollection->all() as $actionCache) {
                 $response = $this->getResponse(
-                    severRequest: $request,
-                    actionCache:  $actionCache,
+                    serverRequest: $request,
+                    actionCache:   $actionCache,
                 );
 
                 if ($response === null) {
@@ -77,27 +77,27 @@ class RequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @param ServerRequestInterface $severRequest
+     * @param ServerRequestInterface $serverRequest
      * @param ActionCache $actionCache
      * @return ResponseInterface|null
      * @throws \ReflectionException
      */
     private function getResponse(
-        ServerRequestInterface $severRequest,
+        ServerRequestInterface $serverRequest,
         ActionCache $actionCache,
     ): ?ResponseInterface {
         if (
-            $actionCache->route->method->value !== $severRequest->getMethod()
-            || !$this->matcher->compare($severRequest, $actionCache->route)
+            $actionCache->route->method->value !== $serverRequest->getMethod()
+            || !$this->matcher->compare($serverRequest, $actionCache->route)
         ) {
             return null;
         }
 
         if (!empty($queryParams = $this->matcher->getQueryParams())) {
-            $severRequest = $severRequest->withQueryParams(
-                !empty($severRequest->getQueryParams())
+            $serverRequest = $serverRequest->withQueryParams(
+                empty($serverRequest->getQueryParams())
                     ? $queryParams
-                    : array_merge($severRequest->getQueryParams(), $queryParams)
+                    : array_merge($serverRequest->getQueryParams(), $queryParams)
             );
         }
 
@@ -108,7 +108,7 @@ class RequestHandler implements RequestHandlerInterface
 
         /** @var Request $request */
         $request = $this->container->get($actionCache->handleMethodParams['request'] ?? Request::class, [
-            'request' => $severRequest,
+            'request' => $serverRequest,
         ]);
 
         return $this->performMiddlewares(
