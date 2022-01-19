@@ -11,9 +11,11 @@ use Nyxio\Helper\Attribute\ExtractAttribute;
 use Nyxio\Routing\Attribute\Middleware;
 use Nyxio\Routing\Attribute\Route;
 use Nyxio\Routing\Attribute\RouteGroup;
+use Nyxio\Routing\Group;
 use Nyxio\Validation\Attribute\Validation;
 
 use function Nyxio\Helper\Reflection\getMethodParametersNames;
+use function Nyxio\Helper\Url\joinUri;
 
 class ActionCollection implements ActionCollectionInterface
 {
@@ -56,28 +58,32 @@ class ActionCollection implements ActionCollectionInterface
 
             $middlewares = [];
             $validations = [];
-            $uriPrefix = '';
+            $uriPrefix = [];
 
-            $routeGroups = $this->getRouteGroups($reflectionClass);
+            $routeGroups = $this->getRouteGroupsNames($reflectionClass);
 
             foreach ($routeGroups as $routeGroup) {
-                $group = $this->groupCollection->get($routeGroup);
+                $rootGroup = $this->groupCollection->get($routeGroup);
 
-                if ($group === null) {
+                if ($rootGroup === null) {
                     continue;
                 }
 
-                $middlewares[] = $group->middlewares;
-                $validations[] = $group->validations;
+                foreach ($this->getRouteGroups($rootGroup) as $group) {
+                    $middlewares[] = $group->middlewares;
+                    $validations[] = $group->validations;
 
-                $route->appendValidators($group->getValidators());
+                    $route->appendValidators($group->getValidators());
 
-                if ($group->prefix) {
-                    $uriPrefix .= $group->prefix;
+                    if ($group->prefix) {
+                        $uriPrefix[] = $group->prefix;
+                    }
                 }
             }
 
-            $route->addPrefix($uriPrefix);
+            if (!empty($uriPrefix)) {
+                $route->addPrefix(joinUri(...$uriPrefix));
+            }
 
             $middlewares = \array_map(
                 fn($middleware) => $this->container->get($middleware),
@@ -102,6 +108,15 @@ class ActionCollection implements ActionCollectionInterface
         }
     }
 
+    private function getRouteGroups(Group $group): array
+    {
+        if ($group->parent !== null) {
+            return \array_merge($this->getRouteGroups($group->parent), [$group]);
+        }
+
+        return [$group];
+    }
+
     private function getMiddlewares(\ReflectionClass $actionReflection): array
     {
         return \array_map(
@@ -110,7 +125,7 @@ class ActionCollection implements ActionCollectionInterface
         );
     }
 
-    private function getRouteGroups(\ReflectionClass $actionReflection): array
+    private function getRouteGroupsNames(\ReflectionClass $actionReflection): array
     {
         return \array_map(
             static fn(RouteGroup $group) => $group->name,
