@@ -31,8 +31,9 @@ class ServerProvider implements ProviderInterface
             $port = $this->config->get('server.port', 9501);
 
             $server = match ($protocol) {
-                default => new \Swoole\Http\Server($host, $port),
+                ServerProtocol::HTTP => new \Swoole\Http\Server($host, $port),
                 ServerProtocol::WebSocket => new \Swoole\WebSocket\Server($host, $port),
+                default => throw new \RuntimeException('Invalid protocol %s', $protocol),
             };
 
             $server->on('start', function () {
