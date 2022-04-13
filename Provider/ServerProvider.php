@@ -24,7 +24,9 @@ class ServerProvider implements ProviderInterface
             $protocol = $this->config->get('server.protocol', ServerProtocol::HTTP);
 
             if (!$protocol instanceof \BackedEnum) {
-                $protocol = ServerProtocol::tryFrom($protocol) ?? ServerProtocol::HTTP;
+                $protocol = ServerProtocol::tryFrom($protocol) ?? throw new \RuntimeException(
+                        \sprintf('Invalid protocol %s', $protocol)
+                    );
             }
 
             $host = $this->config->get('server.host', '127.0.0.1');
@@ -54,6 +56,10 @@ class ServerProvider implements ProviderInterface
             $this->config->get('server.host', '127.0.0.1'),
             $this->config->get('server.port', 9501)
         );
+
+        foreach ($this->config->get('server.options', []) as $key => $option) {
+            echo \sprintf(" %s \e[1m\033[32m%s\033[0m" . \PHP_EOL, $key, $option);
+        }
 
         echo "------------------------------\e[7mApplication settings\e[0m-------------------------------------------" . \PHP_EOL;
         echo sprintf(
