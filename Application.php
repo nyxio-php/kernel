@@ -10,11 +10,10 @@ use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
 use Nyxio\Provider\Dispatcher;
+use Swoole\Server;
 
 class Application
 {
-    private ?ServerBridge $serverBridge;
-
     public function __construct(
         private readonly ConfigInterface $config = new MemoryConfig(),
         private readonly ContainerInterface $container = new Container()
@@ -31,20 +30,22 @@ class Application
     {
         $this->dispatchProviders();
 
-        $server = $this->container->get(ServerBridge::class);
-
-        if (!$server instanceof ServerBridge) {
-            throw new \RuntimeException(\sprintf('%s was not specified', ServerBridge::class));
-        }
-
-        $this->serverBridge = $server;
-
         return $this;
     }
 
-    public function request(): \Closure
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function start(): void
     {
-        return $this->serverBridge->request();
+        $server = $this->container->get(Server::class);
+
+        if (!$server instanceof Server) {
+            throw new \RuntimeException(\sprintf('%s was not specified', Server::class));
+        }
+
+        $server->start();
     }
 
     /**
