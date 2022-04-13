@@ -41,7 +41,7 @@ class ServerProvider implements ProviderInterface
                 $this->serverStartMessage();
             });
 
-            $server->set($this->config->get('server.options'));
+            $server->set($this->config->get('server.options', []));
 
             return $server;
         });
