@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Nyxio\Kernel\Provider;
 
+use Nyxio\Contract\Http\ContentType;
+use Nyxio\Contract\Http\HttpStatus;
+use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
 use Nyxio\Contract\Provider\ProviderInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Http\Request;
@@ -18,14 +22,30 @@ class HttpHandlersProvider implements ProviderInterface
         private readonly Server $server,
         private readonly RequestHandlerInterface $requestHandler,
         private readonly ServerRequestFactoryInterface $requestFactory,
+        private readonly ExceptionTransformerInterface $exceptionTransformer,
+        private readonly ResponseFactoryInterface $responseFactory,
     ) {
     }
 
     public function process(): void
     {
         $this->server->on('request', function (Request $httpRequest, Response $httpResponse) {
-            $request = $this->getRequest($httpRequest);
-            $response = $this->requestHandler->handle($request);
+            try {
+                $request = $this->getRequest($httpRequest);
+                $response = $this->requestHandler->handle($request);
+            } catch (\JsonException $exception) {
+                $response = $this->responseFactory->createResponse(HttpStatus::BadRequest->value);
+                $response = $response->withHeader('Content-Type', ContentType::Json->value);
+                $response->getBody()->write(
+                    \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
+                );
+            } catch (\Throwable $exception) {
+                $response = $this->responseFactory->createResponse(HttpStatus::InternalServerError->value);
+                $response = $response->withHeader('Content-Type', ContentType::Json->value);
+                $response->getBody()->write(
+                    \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
+                );
+            }
 
             foreach ($response->getHeaders() as $key => $headers) {
                 $httpResponse->setHeader($key, $response->getHeaderLine($key));
