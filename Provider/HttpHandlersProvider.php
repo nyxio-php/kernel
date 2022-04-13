@@ -41,8 +41,8 @@ class HttpHandlersProvider implements ProviderInterface
     {
         $uri = $swooleRequest->server['request_uri'];
 
-        if (!empty($swooleRequest['query_string'])) {
-            $uri .= '?' . $swooleRequest['query_string'];
+        if (!empty($swooleRequest->server['query_string'])) {
+            $uri .= '?' . $swooleRequest->server['query_string'];
         }
 
         $request = $this->requestFactory->createServerRequest(
