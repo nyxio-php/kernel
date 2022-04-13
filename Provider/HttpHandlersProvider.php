@@ -8,7 +8,6 @@ use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
 use Nyxio\Contract\Provider\ProviderInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriFactoryInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Server;
@@ -37,6 +36,9 @@ class HttpHandlersProvider implements ProviderInterface
         });
     }
 
+    /**
+     * @throws \JsonException
+     */
     private function getRequest(Request $swooleRequest): ServerRequestInterface
     {
         $uri = $swooleRequest->server['request_uri'];
@@ -50,6 +52,12 @@ class HttpHandlersProvider implements ProviderInterface
             $uri,
             $swooleRequest->server,
         );
+
+        if (!empty($swooleRequest->getContent())) {
+            $request = $request->withParsedBody(
+                \json_decode($swooleRequest->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            );
+        }
 
         $request->withParsedBody($swooleRequest->post);
 
