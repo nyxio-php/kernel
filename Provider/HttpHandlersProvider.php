@@ -33,12 +33,6 @@ class HttpHandlersProvider implements ProviderInterface
             try {
                 $request = $this->getRequest($httpRequest);
                 $response = $this->requestHandler->handle($request);
-            } catch (\JsonException $exception) {
-                $response = $this->responseFactory->createResponse(HttpStatus::BadRequest->value);
-                $response = $response->withHeader('Content-Type', ContentType::Json->value);
-                $response->getBody()->write(
-                    \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
-                );
             } catch (\Throwable $exception) {
                 $response = $this->responseFactory->createResponse(HttpStatus::InternalServerError->value);
                 $response = $response->withHeader('Content-Type', ContentType::Json->value);
