@@ -52,6 +52,8 @@ class HttpServerProvider implements ProviderInterface
                 $httpResponse->setHeader($key, $response->getHeaderLine($key));
             }
 
+            $httpResponse->setStatusCode($response->getStatusCode());
+
             $httpResponse->end((string)$response->getBody());
         });
     }
