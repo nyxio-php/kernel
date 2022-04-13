@@ -24,9 +24,9 @@ class ServerProvider implements ProviderInterface
             $protocol = $this->config->get('server.protocol', ServerProtocol::HTTP);
 
             if (!$protocol instanceof \BackedEnum) {
-                $protocol = ServerProtocol::tryFrom($protocol) ?? throw new \RuntimeException(
-                        \sprintf('Invalid protocol %s', $protocol)
-                    );
+                throw new \RuntimeException(
+                    \sprintf('Invalid protocol %s', $protocol)
+                );
             }
 
             $host = $this->config->get('server.host', '127.0.0.1');
@@ -35,7 +35,6 @@ class ServerProvider implements ProviderInterface
             $server = match ($protocol) {
                 ServerProtocol::HTTP => new \Swoole\Http\Server($host, $port),
                 ServerProtocol::WebSocket => new \Swoole\WebSocket\Server($host, $port),
-                default => throw new \RuntimeException('Invalid protocol %s', $protocol),
             };
 
             $server->on('start', function () {
@@ -52,7 +51,7 @@ class ServerProvider implements ProviderInterface
     {
         echo sprintf(
             \PHP_EOL . 'Server is started at %s://%s:%s' . \PHP_EOL,
-            $this->config->get('server.protocol', ServerProtocol::HTTP->value),
+            $this->config->get('server.protocol', ServerProtocol::HTTP)->value,
             $this->config->get('server.host', '127.0.0.1'),
             $this->config->get('server.port', 9501)
         );
