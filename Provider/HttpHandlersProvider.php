@@ -8,6 +8,7 @@ use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
 use Nyxio\Contract\Provider\ProviderInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Server;
@@ -38,9 +39,15 @@ class HttpHandlersProvider implements ProviderInterface
 
     private function getRequest(Request $swooleRequest): ServerRequestInterface
     {
+        $uri = $swooleRequest->server['request_uri'];
+
+        if (!empty($swooleRequest['query_string'])) {
+            $uri .= '?' . $swooleRequest['query_string'];
+        }
+
         $request = $this->requestFactory->createServerRequest(
             $swooleRequest->getMethod(),
-            $swooleRequest->server['request_uri'],
+            $uri,
             $swooleRequest->server,
         );
 
