@@ -23,7 +23,6 @@
         "nyxio/event": "dev-main",
         "nyxio/routing": "dev-main",
         "nyxio/validation": "dev-main",
-        "nyxio/server": "dev-main",
         "nyxio/helper": "dev-main",
         "nyxio/config": "dev-main",
         "nyxio/container": "dev-main"
