@@ -7,10 +7,9 @@ namespace Nyxio\Kernel\Provider;
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
-use Nyxio\Contract\Kernel\Server\ServerProtocol;
 use Nyxio\Contract\Provider\ProviderInterface;
-use Nyxio\Kernel\Server\Http\HttpServerEventHandler;
-use Swoole\Server;
+use Nyxio\Kernel\Server\Http\ServerEventHandler;
+use Swoole\Http\Server;
 
 class ServerProvider implements ProviderInterface
 {
@@ -23,21 +22,10 @@ class ServerProvider implements ProviderInterface
     public function process(): void
     {
         $this->container->singletonFn(Server::class, function () {
-            $protocol = $this->config->get('server.protocol', ServerProtocol::HTTP);
-
-            if (!$protocol instanceof \BackedEnum) {
-                throw new \RuntimeException(
-                    \sprintf('Invalid protocol %s', $protocol)
-                );
-            }
-
-            $host = $this->config->get('server.host', '127.0.0.1');
-            $port = $this->config->get('server.port', 9501);
-
-            $server = match ($protocol) {
-                ServerProtocol::HTTP => new \Swoole\Http\Server($host, $port),
-                ServerProtocol::WebSocket => new \Swoole\WebSocket\Server($host, $port),
-            };
+            $server = new Server(
+                $this->config->get('server.host', '127.0.0.1'),
+                $this->config->get('server.port', 9501)
+            );
 
             $server->on('start', function () {
                 $this->serverStartMessage();
@@ -48,14 +36,13 @@ class ServerProvider implements ProviderInterface
             return $server;
         });
 
-        $this->container->singleton(ServerEventHandlerInterface::class, HttpServerEventHandler::class);
+        $this->container->singleton(ServerEventHandlerInterface::class, ServerEventHandler::class);
     }
 
     private function serverStartMessage(): void
     {
         echo sprintf(
-            \PHP_EOL . 'Server is started at %s://%s:%s' . \PHP_EOL,
-            $this->config->get('server.protocol', ServerProtocol::HTTP)->value,
+            \PHP_EOL . 'Server is started at http://%s:%s' . \PHP_EOL,
             $this->config->get('server.host', '127.0.0.1'),
             $this->config->get('server.port', 9501)
         );

@@ -6,9 +6,9 @@ namespace Nyxio\Kernel\Server\Http;
 
 use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Kernel\Server\Http\Event\RequestHandler;
-use Swoole\Server;
+use Swoole\Http\Server;
 
-class HttpServerEventHandler implements ServerEventHandlerInterface
+class ServerEventHandler implements ServerEventHandlerInterface
 {
     public function __construct(private readonly Server $server, private readonly RequestHandler $requestHandler)
     {

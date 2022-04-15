@@ -11,7 +11,7 @@ use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
 use Nyxio\Provider\Dispatcher;
-use Swoole\Server;
+use Swoole\Http\Server;
 
 class Application
 {
