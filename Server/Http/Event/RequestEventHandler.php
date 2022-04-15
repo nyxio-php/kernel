@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Http\Response;
 
-class RequestHandler
+class RequestEventHandler
 {
     public function __construct(
         private readonly RequestHandlerInterface $requestHandler,
