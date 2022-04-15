@@ -8,6 +8,7 @@ use Nyxio\Contract\Http\ContentType;
 use Nyxio\Contract\Http\HttpStatus;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
+use Nyxio\Http\Exception\HttpException;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -52,9 +53,14 @@ class RequestEventHandler
 
     /**
      * @throws \JsonException
+     * @throws HttpException
      */
     private function getRequest(\Swoole\Http\Request $swooleRequest): ServerRequestInterface
     {
+        if (!empty($swooleRequest->files)) {
+            throw new HttpException(HttpStatus::BadRequest, 'File upload not supported');
+        }
+
         $uri = $swooleRequest->server['request_uri'];
 
         if (!empty($swooleRequest->server['query_string'])) {
