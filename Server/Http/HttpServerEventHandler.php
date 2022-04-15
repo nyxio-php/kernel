@@ -14,7 +14,7 @@ class HttpServerEventHandler implements ServerEventHandlerInterface
     {
     }
 
-    public function handle(Server $server): void
+    public function handle(): void
     {
         $this->server->on('request', [$this->requestHandler, 'handle']);
     }

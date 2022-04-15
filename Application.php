@@ -30,7 +30,7 @@ class Application
     public function bootstrap(): static
     {
         $this->dispatchProviders();
-        $this->serverEventHandler();
+        $this->bindServerEventHandler();
 
         return $this;
     }
@@ -69,20 +69,14 @@ class Application
      * @return void
      * @throws \ReflectionException
      */
-    private function serverEventHandler(): void
+    private function bindServerEventHandler(): void
     {
-        $server = $this->container->get(Server::class);
-
-        if (!$server instanceof Server) {
-            throw new \RuntimeException(\sprintf('%s was not specified', Server::class));
-        }
-
-        $handler = $this->container->get(ServerEventHandlerInterface::class);
-
-        if (!$handler instanceof ServerEventHandlerInterface) {
+        if (!$this->container->hasSingleton(ServerEventHandlerInterface::class)) {
             throw new \RuntimeException(\sprintf('%s was not specified', ServerEventHandlerInterface::class));
         }
 
-        $handler->handle($server);
+        /** @var ServerEventHandlerInterface $handler */
+        $handler = $this->container->get(ServerEventHandlerInterface::class);
+        $handler->handle();
     }
 }
