@@ -8,6 +8,7 @@ use Nyxio\Config\MemoryConfig;
 use Nyxio\Container\Container;
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
 use Nyxio\Provider\Dispatcher;
 use Swoole\Server;
@@ -29,6 +30,7 @@ class Application
     public function bootstrap(): static
     {
         $this->dispatchProviders();
+        $this->serverEventHandler();
 
         return $this;
     }
@@ -61,5 +63,26 @@ class Application
         }
 
         $dispatcher->dispatch($this->config->get('app.providers', []));
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    private function serverEventHandler(): void
+    {
+        $server = $this->container->get(Server::class);
+
+        if (!$server instanceof Server) {
+            throw new \RuntimeException(\sprintf('%s was not specified', Server::class));
+        }
+
+        $handler = $this->container->get(ServerEventHandlerInterface::class);
+
+        if (!$handler instanceof ServerEventHandlerInterface) {
+            throw new \RuntimeException(\sprintf('%s was not specified', ServerEventHandlerInterface::class));
+        }
+
+        $handler->handle($server);
     }
 }

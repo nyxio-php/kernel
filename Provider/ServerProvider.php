@@ -6,8 +6,10 @@ namespace Nyxio\Kernel\Provider;
 
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
+use Nyxio\Contract\Kernel\Server\ServerProtocol;
 use Nyxio\Contract\Provider\ProviderInterface;
-use Nyxio\Contract\Server\ServerProtocol;
+use Nyxio\Kernel\Server\Http\HttpServerEventHandler;
 use Swoole\Server;
 
 class ServerProvider implements ProviderInterface
@@ -45,6 +47,8 @@ class ServerProvider implements ProviderInterface
 
             return $server;
         });
+
+        $this->container->singleton(ServerEventHandlerInterface::class, HttpServerEventHandler::class);
     }
 
     private function serverStartMessage(): void

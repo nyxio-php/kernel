@@ -2,24 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Provider;
+namespace Nyxio\Kernel\Server\Http\Event;
 
 use Nyxio\Contract\Http\ContentType;
 use Nyxio\Contract\Http\HttpStatus;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
-use Nyxio\Contract\Provider\ProviderInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Swoole\Http\Request;
 use Swoole\Http\Response;
-use Swoole\Server;
 
-class HttpHandlersProvider implements ProviderInterface
+class RequestHandler
 {
     public function __construct(
-        private readonly Server $server,
         private readonly RequestHandlerInterface $requestHandler,
         private readonly ServerRequestFactoryInterface $requestFactory,
         private readonly ExceptionTransformerInterface $exceptionTransformer,
@@ -27,33 +23,37 @@ class HttpHandlersProvider implements ProviderInterface
     ) {
     }
 
-    public function process(): void
+    /**
+     * @param \Swoole\Http\Request $httpRequest
+     * @param Response $httpResponse
+     * @return void
+     * @throws \JsonException
+     */
+    public function handle(\Swoole\Http\Request $httpRequest, Response $httpResponse): void
     {
-        $this->server->on('request', function (Request $httpRequest, Response $httpResponse) {
-            try {
-                $request = $this->getRequest($httpRequest);
-                $response = $this->requestHandler->handle($request);
-            } catch (\Throwable $exception) {
-                $response = $this->responseFactory->createResponse(HttpStatus::InternalServerError->value);
-                $response = $response->withHeader('Content-Type', ContentType::Json->value);
-                $response->getBody()->write(
-                    \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
-                );
-            }
+        try {
+            $request = $this->getRequest($httpRequest);
+            $response = $this->requestHandler->handle($request);
+        } catch (\Throwable $exception) {
+            $response = $this->responseFactory->createResponse(HttpStatus::InternalServerError->value);
+            $response = $response->withHeader('Content-Type', ContentType::Json->value);
+            $response->getBody()->write(
+                \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
+            );
+        }
 
-            foreach ($response->getHeaders() as $key => $headers) {
-                $httpResponse->setHeader($key, $response->getHeaderLine($key));
-            }
+        foreach ($response->getHeaders() as $key => $headers) {
+            $httpResponse->setHeader($key, $response->getHeaderLine($key));
+        }
 
-            $httpResponse->setStatusCode($response->getStatusCode());
-            $httpResponse->end((string)$response->getBody());
-        });
+        $httpResponse->setStatusCode($response->getStatusCode());
+        $httpResponse->end((string)$response->getBody());
     }
 
     /**
      * @throws \JsonException
      */
-    private function getRequest(Request $swooleRequest): ServerRequestInterface
+    private function getRequest(\Swoole\Http\Request $swooleRequest): ServerRequestInterface
     {
         $uri = $swooleRequest->server['request_uri'];
 
