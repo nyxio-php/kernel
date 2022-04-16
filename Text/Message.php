@@ -17,18 +17,22 @@ class Message implements MessageInterface
     {
     }
 
-    public function text(string $message, array $params = []): string
+    public function text(string $message, array $params = [], ?string $language = null): string
     {
-        $message = $this->config->get($this->getLangConfig($message), $message);
+        if (empty($message)) {
+            throw new \InvalidArgumentException('Message cannot be empty');
+        }
+
+        $message = $this->config->get($this->getConfigKey($message, $language), $message);
 
         return empty($params) ? $message : getFormattedText($message, $params);
     }
 
-    private function getLangConfig(string $message): string
+    private function getConfigKey(string $message, ?string $language = null): string
     {
         return \sprintf(
             'lang/%s.%s',
-            $this->config->get('app.lang', static::DEFAULT_LANG),
+            $language ?? $this->config->get('app.lang', static::DEFAULT_LANG),
             $message
         );
     }
