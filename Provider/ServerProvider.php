@@ -19,6 +19,7 @@ class ServerProvider implements ProviderInterface
     ) {
     }
 
+
     public function process(): void
     {
         $this->container->singletonFn(Server::class, function () {
@@ -28,8 +29,9 @@ class ServerProvider implements ProviderInterface
             );
 
             $server->on('start', function () {
-                $this->serverStartMessage();
-            });
+                    $this->serverStartMessage();
+                }
+            );
 
             $server->set($this->config->get('server.options', []));
 
@@ -39,6 +41,11 @@ class ServerProvider implements ProviderInterface
         $this->container->singleton(ServerEventHandlerInterface::class, ServerEventHandler::class);
     }
 
+    /**
+     * @return void
+     *
+     * @codeCoverageIgnore
+     */
     private function serverStartMessage(): void
     {
         echo sprintf(
