@@ -38,6 +38,7 @@ class Application
     /**
      * @return void
      * @throws \ReflectionException
+     * @codeCoverageIgnore
      */
     public function start(): void
     {

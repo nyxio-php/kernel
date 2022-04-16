@@ -33,6 +33,7 @@ class RequestHandler implements RequestHandlerInterface
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws \JsonException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -60,19 +61,11 @@ class RequestHandler implements RequestHandlerInterface
 
             $response = $response->withHeader('Content-Type', ContentType::Json->value);
 
-            try {
-                $response->getBody()->write(
-                    \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
-                );
+            $response->getBody()->write(
+                \json_encode($this->exceptionTransformer->toArray($exception), JSON_THROW_ON_ERROR)
+            );
 
-                return $response;
-            } catch (\JsonException) {
-                $response = $this->responseFactory->createResponse(HttpStatus::InternalServerError->value);
-                $response = $response->withHeader('Content-Type', ContentType::Json->value);
-                $response->getBody()->write('Internal Server Error');
-
-                return $response;
-            }
+            return $response;
         }
     }
 
