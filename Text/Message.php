@@ -27,7 +27,7 @@ class Message implements MessageInterface
     private function getLangConfig(string $message): string
     {
         return \sprintf(
-            'lang.%s.%s',
+            'lang/%s.%s',
             $this->config->get('app.lang', static::DEFAULT_LANG),
             $message
         );
