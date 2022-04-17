@@ -64,6 +64,7 @@ class ServerProvider implements ProviderInterface
             $this->config->get('app.debug', false) ? "\033[31mYes" : "\033[32mNo"
         );
         echo sprintf("* Environments: \e[1m\033[32m%s\033[0m" . \PHP_EOL, $this->config->get('app.env', 'local'));
+        echo sprintf("* Language: \e[1m\033[32m%s\033[0m" . \PHP_EOL, $this->config->get('app.lng', 'en'));
         echo sprintf("* Timezone: \e[1m\033[32m%s\033[0m" . \PHP_EOL, $this->config->get('app.timezone', 'UTC'));
         echo sprintf(
             "* Loaded providers: \e[1m\033[32m%d\033[0m" . \PHP_EOL,
