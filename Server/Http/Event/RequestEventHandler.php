@@ -14,6 +14,9 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Http\Response;
 
+/**
+ * @codeCoverageIgnore
+ */
 class RequestEventHandler
 {
     public function __construct(

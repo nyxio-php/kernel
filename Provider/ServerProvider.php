@@ -20,6 +20,11 @@ class ServerProvider implements ProviderInterface
     }
 
 
+    /**
+     * @return void
+     *
+     * @codeCoverageIgnore
+     */
     public function process(): void
     {
         $this->container->singletonFn(Server::class, function () {
