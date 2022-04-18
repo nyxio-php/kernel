@@ -17,14 +17,14 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
-        "nyxio/contract": "^1.0.4",
-        "nyxio/http": "^1.0.4",
-        "nyxio/provider": "^1.0.4",
-        "nyxio/event": "^1.0.4",
-        "nyxio/routing": "^1.0.4",
-        "nyxio/validation": "^1.0.4",
-        "nyxio/helper": "^1.0.4",
-        "nyxio/config": "^1.0.4",
-        "nyxio/container": "^1.0.4"
+        "nyxio/contract": "^1.1",
+        "nyxio/http": "^1.1",
+        "nyxio/provider": "^1.1",
+        "nyxio/event": "^1.1",
+        "nyxio/routing": "^1.1",
+        "nyxio/validation": "^1.1",
+        "nyxio/helper": "^1.1",
+        "nyxio/config": "^1.1",
+        "nyxio/container": "^1.1"
     }
 }
