@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Provider;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyxio\Contract;
 use Nyxio\Event;
 use Nyxio\Http;
 use Nyxio\Kernel;
 use Nyxio\Provider;
 use Nyxio\Routing;
 use Nyxio\Validation;
-use Nyxio\Contract;
 use Psr\Http\Message;
 
 class KernelProvider implements Contract\Provider\ProviderInterface
@@ -40,13 +40,13 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         );
 
         $this->container->singleton(
-            Contract\Validation\Handler\RulesCheckerInterface::class,
-            Validation\Handler\RulesChecker::class
+            Contract\Validation\RulesCheckerInterface::class,
+            Validation\RulesChecker::class
         );
 
         $this->container->bind(
-            Contract\Validation\Handler\ValidationInterface::class,
-            Validation\Handler\Validation::class
+            Contract\Validation\ValidationInterface::class,
+            Validation\Validation::class
         );
     }
 
@@ -94,7 +94,8 @@ class KernelProvider implements Contract\Provider\ProviderInterface
 
     private function bootstrap(): void
     {
-        $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)->register(Validation\DefaultRules::class);
+        $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)->register(
+            Validation\Helper\DefaultRules::class);
 
         foreach ($this->config->get('http.groups', []) as $group) {
             $this->container->get(Contract\Routing\GroupCollectionInterface::class)->register($group);

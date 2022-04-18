@@ -38,10 +38,10 @@ class RequestHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            foreach ($this->actionCollection->all() as $actionCache) {
+            foreach ($this->actionCollection->all() as $action) {
                 $response = $this->getResponse(
                     serverRequest: $request,
-                    actionCache:   $actionCache,
+                    actionCache:   $action,
                 );
 
                 if ($response === null) {
@@ -71,13 +71,13 @@ class RequestHandler implements RequestHandlerInterface
 
     /**
      * @param ServerRequestInterface $serverRequest
-     * @param ActionCache $actionCache
+     * @param Action $actionCache
      * @return ResponseInterface|null
      * @throws \ReflectionException
      */
     private function getResponse(
         ServerRequestInterface $serverRequest,
-        ActionCache $actionCache,
+        Action $actionCache,
     ): ?ResponseInterface {
         if (
             $actionCache->route->method->value !== $serverRequest->getMethod()

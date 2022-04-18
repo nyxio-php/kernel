@@ -7,7 +7,7 @@ namespace Nyxio\Kernel\Request;
 use Nyxio\Contract\Http\MiddlewareInterface;
 use Nyxio\Routing\Attribute\Route;
 
-class ActionCache
+class Action
 {
     /**
      * @param object $instance

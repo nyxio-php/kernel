@@ -20,7 +20,7 @@ use function Nyxio\Helper\Url\joinUri;
 class ActionCollection implements ActionCollectionInterface
 {
     /**
-     * @var ActionCache[]
+     * @var Action[]
      */
     private array $actions = [];
 
@@ -32,7 +32,7 @@ class ActionCollection implements ActionCollectionInterface
     }
 
     /**
-     * @return ActionCache[]
+     * @return Action[]
      */
     public function all(): array
     {
@@ -97,7 +97,7 @@ class ActionCollection implements ActionCollectionInterface
 
             $handle = $reflectionClass->getMethod('handle');
 
-            $this->actions[$action] = new ActionCache(
+            $this->actions[$action] = new Action(
                 instance:           $this->container->get($action),
                 handleMethod:       $handle,
                 handleMethodParams: getMethodParametersNames($handle),
