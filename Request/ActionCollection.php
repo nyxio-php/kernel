@@ -73,7 +73,7 @@ class ActionCollection implements ActionCollectionInterface
                     $middlewares[] = $group->middlewares;
                     $validations[] = $group->validations;
 
-                    $route->appendValidators($group->getValidators());
+                    $route->appendFields($group->getFields());
 
                     if ($group->prefix) {
                         $uriPrefix[] = $group->prefix;

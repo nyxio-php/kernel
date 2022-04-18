@@ -45,8 +45,8 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         );
 
         $this->container->bind(
-            Contract\Validation\Handler\ValidatorCollectionInterface::class,
-            Validation\Handler\ValidatorCollection::class
+            Contract\Validation\Handler\ValidationInterface::class,
+            Validation\Handler\Validation::class
         );
     }
 
