@@ -18,14 +18,14 @@
     "require": {
         "php": ">=8.1",
         "ext-openswoole": "*",
-        "nyxio/contract": "^1.1",
-        "nyxio/http": "^1.1",
-        "nyxio/provider": "^1.1",
-        "nyxio/event": "^1.1",
-        "nyxio/routing": "^1.1",
-        "nyxio/validation": "^1.1",
-        "nyxio/helper": "^1.1",
-        "nyxio/config": "^1.1",
-        "nyxio/container": "^1.1"
+        "nyxio/contract": "^1.0.7",
+        "nyxio/http": "^1.0.7",
+        "nyxio/provider": "^1.0.7",
+        "nyxio/event": "^1.0.7",
+        "nyxio/routing": "^1.0.7",
+        "nyxio/validation": "^1.0.7",
+        "nyxio/helper": "^1.0.7",
+        "nyxio/config": "^1.0.7",
+        "nyxio/container": "^1.0.7"
     }
 }
