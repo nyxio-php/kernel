@@ -9,7 +9,9 @@ use Nyxio\Contract\Http\HttpStatus;
 use Nyxio\Contract\Http\Method;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
+use Nyxio\Event;
 use Nyxio\Http\Exception\HttpException;
+use Nyxio\Kernel\Event\ResponseEvent;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,6 +27,7 @@ class RequestEventHandler
         private readonly ServerRequestFactoryInterface $requestFactory,
         private readonly ExceptionTransformerInterface $exceptionTransformer,
         private readonly ResponseFactoryInterface $responseFactory,
+        private readonly Event\Dispatcher $eventDispatcher,
     ) {
     }
 
@@ -50,6 +53,8 @@ class RequestEventHandler
         foreach ($response->getHeaders() as $key => $headers) {
             $httpResponse->setHeader($key, $response->getHeaderLine($key));
         }
+
+        $this->eventDispatcher->dispatch(ResponseEvent::NAME, new ResponseEvent($response, $request));
 
         $httpResponse->setStatusCode($response->getStatusCode());
         $httpResponse->end((string)$response->getBody());

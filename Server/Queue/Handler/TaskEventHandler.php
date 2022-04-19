@@ -6,6 +6,9 @@ namespace Nyxio\Kernel\Server\Queue\Handler;
 
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Queue\OptionsInterface;
+use Nyxio\Event;
+use Nyxio\Kernel\Event\JobCompleted;
+use Nyxio\Kernel\Event\JobError;
 use Nyxio\Kernel\Server\Queue\Options;
 use Swoole\Http\Server;
 
@@ -14,8 +17,10 @@ use Swoole\Http\Server;
  */
 class TaskEventHandler
 {
-    public function __construct(private readonly ContainerInterface $container)
-    {
+    public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly Event\Dispatcher $eventDispatcher
+    ) {
     }
 
     public function handle(Server $server, int $taskId, int $reactorId, mixed $jobData): void
@@ -52,6 +57,8 @@ class TaskEventHandler
                 $jobData['job'],
                 $exception->getMessage()
             );
+
+            $this->eventDispatcher->dispatch(JobError::NAME, new JobError($jobData['job'], $exception));
         }
     }
 
@@ -66,7 +73,11 @@ class TaskEventHandler
             $handle->invokeArgs($job, $jobData['data']);
 
             $server->finish($jobData);
-        } catch (\Throwable) {
+
+            $this->eventDispatcher->dispatch(JobCompleted::NAME, new JobCompleted($jobData['job']));
+        } catch (\Throwable $exception) {
+            $this->eventDispatcher->dispatch(JobError::NAME, new JobError($jobData['job'], $exception));
+
             if ($options->getRetryCount() === null) {
                 return;
             }
