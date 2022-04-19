@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Nyxio\Kernel\Server\Http\Event;
 
+use Nyxio\Contract\Event\EventDispatcherInterface;
 use Nyxio\Contract\Http\ContentType;
 use Nyxio\Contract\Http\HttpStatus;
 use Nyxio\Contract\Http\Method;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
-use Nyxio\Event;
 use Nyxio\Http\Exception\HttpException;
 use Nyxio\Kernel\Event\ResponseEvent;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -27,7 +27,7 @@ class RequestEventHandler
         private readonly ServerRequestFactoryInterface $requestFactory,
         private readonly ExceptionTransformerInterface $exceptionTransformer,
         private readonly ResponseFactoryInterface $responseFactory,
-        private readonly Event\Dispatcher $eventDispatcher,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -54,7 +54,7 @@ class RequestEventHandler
             $httpResponse->setHeader($key, $response->getHeaderLine($key));
         }
 
-        $this->eventDispatcher->dispatch(ResponseEvent::NAME, new ResponseEvent($response, $request));
+        $this->eventDispatcher->dispatch(ResponseEvent::NAME, new ResponseEvent($response, $request ?? null));
 
         $httpResponse->setStatusCode($response->getStatusCode());
         $httpResponse->end((string)$response->getBody());

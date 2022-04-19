@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Queue\Handler;
 
 use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Event\EventDispatcherInterface;
 use Nyxio\Contract\Queue\OptionsInterface;
-use Nyxio\Event;
 use Nyxio\Kernel\Event\JobCompleted;
 use Nyxio\Kernel\Event\JobError;
 use Nyxio\Kernel\Server\Queue\Options;
@@ -19,7 +19,7 @@ class TaskEventHandler
 {
     public function __construct(
         private readonly ContainerInterface $container,
-        private readonly Event\Dispatcher $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
