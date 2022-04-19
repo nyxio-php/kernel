@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Http;
+namespace Nyxio\Kernel\Server;
 
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;

@@ -77,7 +77,9 @@ class RequestEventHandler
             $swooleRequest->server,
         );
 
-        $request = $request->withCookieParams($swooleRequest->cookie);
+        if (!empty($swooleRequest->cookie)) {
+            $request = $request->withCookieParams($swooleRequest->cookie);
+        }
 
         if ($request->getMethod() !== Method::GET->value && !empty($swooleRequest->getContent())) {
             $request = $request->withParsedBody(

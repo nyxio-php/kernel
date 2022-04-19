@@ -10,7 +10,7 @@ use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Event;
 use Nyxio\Http;
 use Nyxio\Kernel;
-use Nyxio\Kernel\Server\Http\ServerEventHandler;
+use Nyxio\Kernel\Server\ServerEventHandler;
 use Nyxio\Provider;
 use Nyxio\Routing;
 use Nyxio\Validation;
