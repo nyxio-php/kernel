@@ -8,6 +8,8 @@ use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Contract\Provider\ProviderInterface;
 use Nyxio\Kernel\Server\Http\Event\RequestEventHandler;
 use Nyxio\Kernel\Server\Http\Event\StartEventHandler;
+use Nyxio\Kernel\Server\Queue\Handler\FinishEventHandler;
+use Nyxio\Kernel\Server\Queue\Handler\TaskEventHandler;
 
 class ServerProvider implements ProviderInterface
 {
@@ -25,5 +27,7 @@ class ServerProvider implements ProviderInterface
     {
         $this->eventHandler->attach('start', StartEventHandler::class);
         $this->eventHandler->attach('request', RequestEventHandler::class);
+        $this->eventHandler->attach('task', TaskEventHandler::class);
+        $this->eventHandler->attach('finish', FinishEventHandler::class);
     }
 }

@@ -94,6 +94,7 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         $this->container->singleton(Contract\Provider\ProviderDispatcherInterface::class, Provider\Dispatcher::class);
         $this->container->singleton(Contract\Event\EventDispatcherInterface::class, Event\Dispatcher::class);
         $this->container->singleton(Contract\Kernel\Text\MessageInterface::class, Kernel\Text\Message::class);
+        $this->container->singleton(Contract\Queue\QueueInterface::class, Kernel\Server\Queue\Queue::class);
     }
 
     private function bootstrap(): void
