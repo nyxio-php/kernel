@@ -33,15 +33,20 @@ class TaskEventHandler
             $options = $jobData['options'];
             $handle = $reflection->getMethod('handle');
 
-            $server->after($options->getDelay() ?? 0, function () use (
-                $server,
-                $job,
-                $handle,
-                $options,
-                $jobData
-            ) {
+            if ($options->getDelay()) {
+                $server->after($options->getDelay(), function () use (
+                    $server,
+                    $job,
+                    $handle,
+                    $options,
+                    $jobData
+                ) {
+                    $this->execute($server, $job, $handle, $options, $jobData);
+                });
+            } else {
                 $this->execute($server, $job, $handle, $options, $jobData);
-            });
+            }
+
         } catch (\Throwable $exception) {
             echo \sprintf(
                 "Task error (%s): \e[1m\033[91m%s\033[0m" . \PHP_EOL,
