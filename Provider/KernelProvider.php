@@ -6,13 +6,16 @@ namespace Nyxio\Kernel\Provider;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyxio\Contract;
+use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Event;
 use Nyxio\Http;
 use Nyxio\Kernel;
+use Nyxio\Kernel\Server\Http\ServerEventHandler;
 use Nyxio\Provider;
 use Nyxio\Routing;
 use Nyxio\Validation;
 use Psr\Http\Message;
+use Swoole\Http\Server;
 
 class KernelProvider implements Contract\Provider\ProviderInterface
 {
@@ -28,6 +31,7 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         $this->http();
         $this->routing();
         $this->validation();
+        $this->server();
 
         $this->bootstrap();
     }
@@ -104,5 +108,21 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         $this->container->get(Contract\Kernel\Request\ActionCollectionInterface::class)
             ->create($this->config->get('http.actions', []));
 
+    }
+
+    private function server(): void
+    {
+        $this->container->singletonFn(Server::class, function () {
+            $server = new Server(
+                $this->config->get('server.host', '127.0.0.1'),
+                $this->config->get('server.port', 9501)
+            );
+
+            $server->set($this->config->get('server.options', []));
+
+            return $server;
+        });
+
+        $this->container->singleton(ServerEventHandlerInterface::class, ServerEventHandler::class);
     }
 }
