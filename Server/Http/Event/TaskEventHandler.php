@@ -11,8 +11,12 @@ use Swoole\Http\Server;
  */
 class TaskEventHandler
 {
+    public function __construct(private )
+    {
+    }
+
     public function handle(Server $server, int $task_id, int $reactorId, mixed $data): void
     {
-
+//        $server->fin
     }
 }
