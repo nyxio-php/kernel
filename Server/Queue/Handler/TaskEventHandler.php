@@ -39,15 +39,7 @@ class TaskEventHandler
             $handle = $reflection->getMethod('handle');
 
             if ($options->getDelay()) {
-                $server->after($options->getDelay(), function () use (
-                    $server,
-                    $job,
-                    $handle,
-                    $options,
-                    $jobData
-                ) {
-                    $this->execute($server, $job, $handle, $options, $jobData);
-                });
+                $server->after($options->getDelay(), [$this, 'execute']);
             } else {
                 $this->execute($server, $job, $handle, $options, $jobData);
             }
@@ -77,18 +69,19 @@ class TaskEventHandler
             }
 
             if ($options->getRetryCount() > 0) {
-                $server->after(
-                    $options->getRetryDelay() ?? 0,
-                    function () use ($server, $job, $handle, $options, $jobData) {
-                        $options = new Options(
-                            $options->getRetryCount() - 1,
-                            $options->getRetryDelay(),
-                            $options->getDelay(),
-                        );
+                $retry = function () use ($server, $job, $handle, $options, $jobData) {
+                    $options = new Options(
+                        $options->getRetryCount() - 1,
+                        $options->getRetryDelay(),
+                        $options->getDelay(),
+                    );
 
-                        $this->execute($server, $job, $handle, $options, $jobData);
-                    }
-                );
+                    $this->execute($server, $job, $handle, $options, $jobData);
+                };
+
+                $options->getRetryDelay()
+                    ? $server->after($options->getRetryDelay() ?? 0, $retry)
+                    : $retry();
             }
         }
     }
