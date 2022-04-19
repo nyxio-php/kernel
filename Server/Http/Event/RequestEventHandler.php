@@ -6,6 +6,7 @@ namespace Nyxio\Kernel\Server\Http\Event;
 
 use Nyxio\Contract\Http\ContentType;
 use Nyxio\Contract\Http\HttpStatus;
+use Nyxio\Contract\Http\Method;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
 use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
 use Nyxio\Http\Exception\HttpException;
@@ -76,13 +77,13 @@ class RequestEventHandler
             $swooleRequest->server,
         );
 
-        if (!empty($swooleRequest->getContent())) {
+        $request = $request->withCookieParams($swooleRequest->cookie);
+
+        if ($request->getMethod() !== Method::GET->value && !empty($swooleRequest->getContent())) {
             $request = $request->withParsedBody(
                 \json_decode($swooleRequest->getContent(), true, 512, JSON_THROW_ON_ERROR)
             );
         }
-
-        $request->withParsedBody($swooleRequest->post);
 
         foreach ($swooleRequest->header as $name => $value) {
             $request = $request->withHeader($name, $value);
