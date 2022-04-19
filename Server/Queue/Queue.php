@@ -24,7 +24,7 @@ class Queue implements QueueInterface
             data:            [
                                  'job' => $job,
                                  'data' => $data,
-                                 'options' => $options,
+                                 'options' => $options ?? new Options(),
                              ],
         );
     }
