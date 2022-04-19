@@ -52,12 +52,6 @@ class TaskEventHandler
                 $this->execute($server, $job, $handle, $options, $jobData);
             }
         } catch (\Throwable $exception) {
-            echo \sprintf(
-                "Task error (%s): \e[1m\033[91m%s\033[0m" . \PHP_EOL,
-                $jobData['job'],
-                $exception->getMessage()
-            );
-
             $this->eventDispatcher->dispatch(JobError::NAME, new JobError($jobData['job'], $exception));
         }
     }
