@@ -18,26 +18,34 @@ class TaskEventHandler
     {
     }
 
-    public function handle(Server $server, int $taskId, int $reactorId, mixed $data): void
+    public function handle(Server $server, int $taskId, int $reactorId, mixed $jobData): void
     {
         try {
-            $job = $this->container->get($data['job']);
+            $job = $this->container->get($jobData['job']);
 
-            $reflection = new \ReflectionClass($data['job']);
+            $reflection = new \ReflectionClass($jobData['job']);
 
             if (!$reflection->hasMethod('handle')) {
-                throw new \RuntimeException(\sprintf("Job %s doesn't have `handle` method", $data['job']));
+                throw new \RuntimeException(\sprintf("Job %s doesn't have `handle` method", $jobData['job']));
             }
 
+            /** @var OptionsInterface $options */
+            $options = $jobData['options'];
             $handle = $reflection->getMethod('handle');
 
-            $this->execute($server, $job, $handle, $data['options'], $data['data']);
-
-            $server->finish($data);
+            $server->after($options->getDelay() ?? 0, function () use (
+                $server,
+                $job,
+                $handle,
+                $options,
+                $jobData
+            ) {
+                $this->execute($server, $job, $handle, $options, $jobData);
+            });
         } catch (\Throwable $exception) {
             echo \sprintf(
                 "Task error (%s): \e[1m\033[91m%s\033[0m" . \PHP_EOL,
-                $data['job'],
+                $jobData['job'],
                 $exception->getMessage()
             );
         }
@@ -48,11 +56,15 @@ class TaskEventHandler
         object $job,
         \ReflectionMethod $handle,
         OptionsInterface $options,
-        array $data = []
+        array $jobData
     ): void {
         try {
-            $handle->invokeArgs($job, $data['data']);
-        } catch (\Throwable $exception) {
+            if ($options->getDelay()) {
+                $handle->invokeArgs($job, $jobData['data']);
+
+                $server->finish($jobData);
+            }
+        } catch (\Throwable) {
             if ($options->getRetryCount() === null) {
                 return;
             }
@@ -60,14 +72,14 @@ class TaskEventHandler
             if ($options->getRetryCount() > 0) {
                 $server->after(
                     $options->getRetryDelay() ?? 0,
-                    function () use ($server, $job, $handle, $options, $data) {
+                    function () use ($server, $job, $handle, $options, $jobData) {
                         $options = new Options(
                             $options->getRetryCount() - 1,
                             $options->getRetryDelay(),
                             $options->getDelay(),
                         );
 
-                        $this->execute($server, $job, $handle, $options, $data);
+                        $this->execute($server, $job, $handle, $options, $jobData);
                     }
                 );
             }

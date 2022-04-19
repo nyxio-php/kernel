@@ -13,6 +13,5 @@ class FinishEventHandler
 {
     public function handle(Server $server, int $taskId, mixed $data): void
     {
-
     }
 }

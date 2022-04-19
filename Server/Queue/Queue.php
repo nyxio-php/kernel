@@ -26,7 +26,6 @@ class Queue implements QueueInterface
                                  'data' => $data,
                                  'options' => $options,
                              ],
-            finish_callback: $finishCallback,
         );
     }
 }
