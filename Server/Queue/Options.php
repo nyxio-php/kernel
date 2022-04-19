@@ -17,11 +17,11 @@ class Options implements OptionsInterface
             throw new \InvalidArgumentException('Delay cannot be less or equals zero');
         }
 
-        if ($this->delay !== null && $this->retryDelay <= 0) {
+        if ($this->retryDelay !== null && $this->retryDelay <= 0) {
             throw new \InvalidArgumentException('Retry delay cannot be less or equals zero');
         }
 
-        if ($this->delay !== null && $this->retryCount < 0) {
+        if ($this->retryCount !== null && $this->retryCount < 0) {
             throw new \InvalidArgumentException('Retry delay cannot be less than zero');
         }
     }
