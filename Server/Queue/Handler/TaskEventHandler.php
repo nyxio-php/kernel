@@ -46,7 +46,6 @@ class TaskEventHandler
             } else {
                 $this->execute($server, $job, $handle, $options, $jobData);
             }
-
         } catch (\Throwable $exception) {
             echo \sprintf(
                 "Task error (%s): \e[1m\033[91m%s\033[0m" . \PHP_EOL,
@@ -64,11 +63,9 @@ class TaskEventHandler
         array $jobData
     ): void {
         try {
-            if ($options->getDelay()) {
-                $handle->invokeArgs($job, $jobData['data']);
+            $handle->invokeArgs($job, $jobData['data']);
 
-                $server->finish($jobData);
-            }
+            $server->finish($jobData);
         } catch (\Throwable) {
             if ($options->getRetryCount() === null) {
                 return;
