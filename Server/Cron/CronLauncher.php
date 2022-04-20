@@ -45,9 +45,8 @@ class CronLauncher implements CronLauncherInterface
                     function () use ($job, $cron) {
                         $workerData = new WorkerData($job);
                         $this->server->task(
-                            $workerData,
-                            null,
-                            function () use ($workerData, $cron) {
+                            data: $workerData,
+                            finish_callback: function () use ($workerData, $cron) {
                                 $this->server->tick(
                                     $this->calculateNextRunInMilliseconds(
                                         currentDate: new \DateTime(),
