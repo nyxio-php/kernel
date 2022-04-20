@@ -11,6 +11,7 @@ use Swoole\Http\Server;
 
 class Queue implements QueueInterface
 {
+
     public function __construct(private readonly Server $server)
     {
     }
@@ -20,6 +21,13 @@ class Queue implements QueueInterface
         array $data = [],
         ?OptionsInterface $options = null
     ): void {
-        $this->server->task(data: new WorkerData($job, $data, $options));
+        $workerData = new WorkerData($job, $data, $options);
+        $taskId = $this->server->task(data: $workerData);
+
+        if ($taskId === false) {
+            $this->server->after(5000, function () use ($workerData) {
+                $this->server->task($workerData);
+            });
+        }
     }
 }

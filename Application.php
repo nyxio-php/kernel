@@ -40,6 +40,8 @@ class Application
      */
     public function start(): void
     {
+        $this->dispatchProviders();
+
         $server = $this->container->get(Server::class);
 
         if (!$server instanceof Server) {
