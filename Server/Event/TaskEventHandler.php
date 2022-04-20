@@ -7,6 +7,8 @@ namespace Nyxio\Kernel\Server\Event;
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Event\EventDispatcherInterface;
 use Nyxio\Contract\Queue\OptionsInterface;
+use Nyxio\Kernel\Event\CronJobCompleted;
+use Nyxio\Kernel\Event\CronJobError;
 use Nyxio\Kernel\Event\JobCompleted;
 use Nyxio\Kernel\Event\JobError;
 use Nyxio\Kernel\Server\WorkerData;
@@ -45,7 +47,11 @@ class TaskEventHandler
                 $this->execute($server, $job, $handle, $workerData);
             }
         } catch (\Throwable $exception) {
-            $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
+            if ($workerData->isCronJob) {
+                $this->eventDispatcher->dispatch(CronJobError::NAME, new CronJobError($workerData->job, $exception));
+            } else {
+                $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
+            }
         }
     }
 
@@ -60,9 +66,18 @@ class TaskEventHandler
 
             $server->finish($workerData);
 
-            $this->eventDispatcher->dispatch(JobCompleted::NAME, new JobCompleted($workerData->job));
+            if ($workerData->isCronJob) {
+                $this->eventDispatcher->dispatch(CronJobCompleted::NAME, new CronJobCompleted($workerData->job));
+            } else {
+                $this->eventDispatcher->dispatch(JobCompleted::NAME, new JobCompleted($workerData->job));
+            }
         } catch (\Throwable $exception) {
-            $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
+            if ($workerData->isCronJob) {
+                $this->eventDispatcher->dispatch(CronJobError::NAME, new CronJobError($workerData->job, $exception));
+            } else {
+                $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
+            }
+
             if ($workerData->options instanceof OptionsInterface) {
                 if ($workerData->options->getRetryCount() === null) {
                     return;

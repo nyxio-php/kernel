@@ -11,7 +11,8 @@ class WorkerData
     public function __construct(
         public readonly string $job,
         public readonly array $data = [],
-        public readonly ?OptionsInterface $options = null
+        public readonly ?OptionsInterface $options = null,
+        public readonly bool $isCronJob = false,
     ) {
     }
 }
