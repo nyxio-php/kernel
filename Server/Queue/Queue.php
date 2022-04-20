@@ -19,11 +19,20 @@ class Queue implements QueueInterface
     public function push(
         string $job,
         array $data = [],
-        ?OptionsInterface $options = null
+        ?OptionsInterface $options = null,
+        \Closure $finishCallback = null,
     ): void {
-        $idleWorkerId = $this->getIdleWorkerId();
+        $workerId = $this->getIdleWorkerId();
 
-        $this->server->task(new WorkerData($job, $data, $options), $idleWorkerId);
+        if ($workerId === -1) {
+            $this->server->defer(function () use ($job, $data, $options, $finishCallback) {
+                $this->push($job, $data, $options, $finishCallback);
+            });
+
+            return;
+        }
+
+        $this->server->task(new WorkerData($job, $data, $options), $workerId, $finishCallback);
     }
 
     public function getIdleWorkerId(): int
