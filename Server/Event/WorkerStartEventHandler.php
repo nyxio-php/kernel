@@ -8,6 +8,9 @@ use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Kernel\Server\CronLauncherInterface;
 use Swoole\Http\Server;
 
+/**
+ * @codeCoverageIgnore
+ */
 class WorkerStartEventHandler
 {
 

@@ -10,6 +10,9 @@ use Nyxio\Contract\Queue\QueueInterface;
 use Nyxio\Kernel\Server\WorkerData;
 use Swoole\Http\Server;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Queue implements QueueInterface
 {
     public function __construct(private readonly Server $server, private readonly ConfigInterface $config)

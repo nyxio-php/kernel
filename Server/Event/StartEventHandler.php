@@ -6,6 +6,9 @@ namespace Nyxio\Kernel\Server\Event;
 
 use Nyxio\Contract\Config\ConfigInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 class StartEventHandler
 {
     public function __construct(private readonly ConfigInterface $config,)

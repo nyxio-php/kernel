@@ -11,6 +11,9 @@ use Nyxio\Kernel\Server\Cron\Attribute\Cron;
 use Nyxio\Kernel\Server\WorkerData;
 use Swoole\Http\Server;
 
+/**
+ * @codeCoverageIgnore
+ */
 class CronLauncher implements CronLauncherInterface
 {
     public function __construct(
@@ -22,6 +25,7 @@ class CronLauncher implements CronLauncherInterface
     public function launch(array $jobs): void
     {
         $currentDate = new \DateTime();
+
         foreach ($jobs as $job) {
             try {
                 $reflection = new \ReflectionClass($job);

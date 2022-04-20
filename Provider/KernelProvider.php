@@ -123,11 +123,6 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         });
 
         $this->container->singleton(
-            Contract\Kernel\Server\ServerEventHandlerInterface::class,
-            Kernel\Server\ServerEventHandler::class
-        );
-
-        $this->container->singleton(
             Contract\Kernel\Server\CronLauncherInterface::class,
             Kernel\Server\Cron\CronLauncher::class
         );

@@ -38,6 +38,10 @@ class Options implements OptionsInterface
 
     public function decreaseRetryCount(): static
     {
+        if ($this->retryCount === null || $this->retryCount === 0) {
+            return $this;
+        }
+
         --$this->retryCount;
 
         return $this;
