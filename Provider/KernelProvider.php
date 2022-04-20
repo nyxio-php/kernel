@@ -6,11 +6,9 @@ namespace Nyxio\Kernel\Provider;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyxio\Contract;
-use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Event;
 use Nyxio\Http;
 use Nyxio\Kernel;
-use Nyxio\Kernel\Server\ServerEventHandler;
 use Nyxio\Provider;
 use Nyxio\Routing;
 use Nyxio\Validation;
@@ -100,7 +98,8 @@ class KernelProvider implements Contract\Provider\ProviderInterface
     private function bootstrap(): void
     {
         $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)->register(
-            Validation\Helper\DefaultRules::class);
+            Validation\Helper\DefaultRules::class
+        );
 
         foreach ($this->config->get('http.groups', []) as $group) {
             $this->container->get(Contract\Routing\GroupCollectionInterface::class)->register($group);
@@ -108,7 +107,6 @@ class KernelProvider implements Contract\Provider\ProviderInterface
 
         $this->container->get(Contract\Kernel\Request\ActionCollectionInterface::class)
             ->create($this->config->get('http.actions', []));
-
     }
 
     private function server(): void
@@ -124,6 +122,14 @@ class KernelProvider implements Contract\Provider\ProviderInterface
             return $server;
         });
 
-        $this->container->singleton(ServerEventHandlerInterface::class, ServerEventHandler::class);
+        $this->container->singleton(
+            Contract\Kernel\Server\ServerEventHandlerInterface::class,
+            Kernel\Server\ServerEventHandler::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\CronLauncherInterface::class,
+            Kernel\Server\Cron\CronLauncher::class
+        );
     }
 }

@@ -8,6 +8,7 @@ use Nyxio\Config\MemoryConfig;
 use Nyxio\Container\Container;
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Kernel\Server\CronLauncherInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
 use Nyxio\Provider\Dispatcher;
 use Swoole\Http\Server;
@@ -47,6 +48,12 @@ class Application
         }
 
         $server->start();
+
+        $cronLauncher = $this->container->get(CronLauncherInterface::class);
+
+        if ($cronLauncher instanceof CronLauncherInterface) {
+            $cronLauncher->launch($this->config->get('cron.jobs'));
+        }
     }
 
     /**

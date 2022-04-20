@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Cron;
 
 use Cron\CronExpression;
+use Nyxio\Contract\Kernel\Server\CronLauncherInterface;
 use Nyxio\Helper\Attribute\ExtractAttribute;
 use Nyxio\Kernel\Server\Cron\Attribute\Cron;
 use Nyxio\Kernel\Server\Http\WorkerData;
 use Swoole\Http\Server;
 
-class CronJob
+class CronLauncher implements CronLauncherInterface
 {
     public function __construct(
         private readonly Server $server,
@@ -18,7 +19,7 @@ class CronJob
     ) {
     }
 
-    public function handle(array $jobs): void
+    public function launch(array $jobs): void
     {
         $currentDate = new \DateTime();
         foreach ($jobs as $job) {

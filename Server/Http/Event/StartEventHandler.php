@@ -5,20 +5,16 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Http\Event;
 
 use Nyxio\Contract\Config\ConfigInterface;
-use Nyxio\Contract\Queue\QueueInterface;
-use Nyxio\Kernel\Server\Cron\CronJob;
 
 class StartEventHandler
 {
-    public function __construct(private readonly ConfigInterface $config, private readonly QueueInterface $queue)
+    public function __construct(private readonly ConfigInterface $config)
     {
     }
 
     public function handle(): void
     {
         $this->startMessage();
-
-        $this->queue->push(CronJob::class, ['jobs' => $this->config->get('cron.jobs')]);
     }
 
     private function startMessage(): void
