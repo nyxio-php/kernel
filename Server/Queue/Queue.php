@@ -41,8 +41,11 @@ class Queue implements QueueInterface
 
     private function performQueue(): void
     {
-        foreach ($this->queue as $workerData) {
+        $queue = $this->queue;
+
+        foreach ($queue as $key => $workerData) {
             $this->push($workerData->job, $workerData->data, $workerData->options);
+            unset($this->queue[$key]);
         }
     }
 
