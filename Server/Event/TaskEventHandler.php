@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Http\Event;
+namespace Nyxio\Kernel\Server\Event;
 
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Event\EventDispatcherInterface;
 use Nyxio\Contract\Queue\OptionsInterface;
 use Nyxio\Kernel\Event\JobCompleted;
 use Nyxio\Kernel\Event\JobError;
-use Nyxio\Kernel\Server\Http\WorkerData;
+use Nyxio\Kernel\Server\WorkerData;
 use Swoole\Http\Server;
 
 /**

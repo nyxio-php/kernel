@@ -6,10 +6,10 @@ namespace Nyxio\Kernel\Provider;
 
 use Nyxio\Contract\Kernel\Server\ServerEventHandlerInterface;
 use Nyxio\Contract\Provider\ProviderInterface;
-use Nyxio\Kernel\Server\Http\Event\FinishEventHandler;
-use Nyxio\Kernel\Server\Http\Event\RequestEventHandler;
-use Nyxio\Kernel\Server\Http\Event\StartEventHandler;
-use Nyxio\Kernel\Server\Http\Event\TaskEventHandler;
+use Nyxio\Kernel\Server\Event\FinishEventHandler;
+use Nyxio\Kernel\Server\Event\RequestEventHandler;
+use Nyxio\Kernel\Server\Event\StartEventHandler;
+use Nyxio\Kernel\Server\Event\TaskEventHandler;
 
 class ServerProvider implements ProviderInterface
 {

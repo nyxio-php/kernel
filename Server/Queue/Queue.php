@@ -6,7 +6,7 @@ namespace Nyxio\Kernel\Server\Queue;
 
 use Nyxio\Contract\Queue\OptionsInterface;
 use Nyxio\Contract\Queue\QueueInterface;
-use Nyxio\Kernel\Server\Http\WorkerData;
+use Nyxio\Kernel\Server\WorkerData;
 use Swoole\Http\Server;
 
 class Queue implements QueueInterface

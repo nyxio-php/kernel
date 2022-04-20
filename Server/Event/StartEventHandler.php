@@ -2,19 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Http\Event;
+namespace Nyxio\Kernel\Server\Event;
 
 use Nyxio\Contract\Config\ConfigInterface;
+use Nyxio\Contract\Kernel\Server\CronLauncherInterface;
 
 class StartEventHandler
 {
-    public function __construct(private readonly ConfigInterface $config)
-    {
+    public function __construct(
+        private readonly ConfigInterface $config,
+        private readonly CronLauncherInterface $cronLauncher
+    ) {
     }
 
     public function handle(): void
     {
         $this->startMessage();
+        $this->cronLauncher->launch($this->config->get('cron.jobs'));
     }
 
     private function startMessage(): void
