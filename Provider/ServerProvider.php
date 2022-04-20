@@ -10,6 +10,7 @@ use Nyxio\Kernel\Server\Event\FinishEventHandler;
 use Nyxio\Kernel\Server\Event\RequestEventHandler;
 use Nyxio\Kernel\Server\Event\StartEventHandler;
 use Nyxio\Kernel\Server\Event\TaskEventHandler;
+use Nyxio\Kernel\Server\Event\WorkerStartEventHandler;
 
 class ServerProvider implements ProviderInterface
 {
@@ -29,5 +30,6 @@ class ServerProvider implements ProviderInterface
         $this->eventHandler->attach('request', RequestEventHandler::class);
         $this->eventHandler->attach('task', TaskEventHandler::class);
         $this->eventHandler->attach('finish', FinishEventHandler::class);
+        $this->eventHandler->attach('workerStart', WorkerStartEventHandler::class);
     }
 }

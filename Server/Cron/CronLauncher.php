@@ -34,10 +34,9 @@ class CronLauncher implements CronLauncherInterface
                 $cron = new CronExpression($cronAttribute->expression);
 
                 echo \sprintf(
-                    'Cron job %s is registered | %s | next run: %s' . \PHP_EOL,
+                    'Cron job %s is registered | %s' . \PHP_EOL,
                     $job,
                     $cronAttribute->expression,
-                    $cron->getNextRunDate()->format('Y-m-d H:i:s')
                 );
 
                 $this->server->after(
@@ -51,27 +50,6 @@ class CronLauncher implements CronLauncherInterface
                         );
                     }
                 );
-//                $this->server->after(
-//                    $this->calculateNextRunInMilliseconds($currentDate, $cron->getNextRunDate()),
-//                    function () use ($job, $cron) {
-//                        $workerData = new WorkerData($job);
-//                        $this->server->task(
-//                            $workerData,
-//                            -1,
-//                            function () use ($workerData, $cron) {
-//                                $this->server->tick(
-//                                    $this->calculateNextRunInMilliseconds(
-//                                        currentDate: new \DateTime(),
-//                                        nextRunDate: $cron->getNextRunDate()
-//                                    ),
-//                                    function () use ($workerData) {
-//                                        $this->server->task($workerData);
-//                                    }
-//                                );
-//                            }
-//                        );
-//                    }
-//                );
             } catch (\Throwable $exception) {
                 echo \sprintf(
                     'Cron job %s is not registered (%s)' . \PHP_EOL,
