@@ -8,7 +8,7 @@ use Nyxio\Event\Event;
 
 class JobError extends Event
 {
-    public const NAME = 'server.job.error';
+    public const NAME = 'kernel.job.error';
 
     public function __construct(public readonly string $job, public readonly \Throwable $exception)
     {

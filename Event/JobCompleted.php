@@ -8,7 +8,7 @@ use Nyxio\Event\Event;
 
 class JobCompleted extends Event
 {
-    public const NAME = 'server.job.completed';
+    public const NAME = 'kernel.job.completed';
 
     public function __construct(public readonly string $job)
     {

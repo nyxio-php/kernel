@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ResponseEvent extends Event
 {
-    public const NAME = 'response';
+    public const NAME = 'kernel.response';
 
     public function __construct(
         public readonly ResponseInterface $response,
