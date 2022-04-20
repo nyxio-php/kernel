@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Queue\Handler;
+namespace Nyxio\Kernel\Server\Http\Event;
 
 use Swoole\Http\Server;
 

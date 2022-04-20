@@ -9,7 +9,7 @@ use Nyxio\Contract\Queue\OptionsInterface;
 class Options implements OptionsInterface
 {
     public function __construct(
-        private readonly ?int $retryCount = null,
+        private ?int $retryCount = null,
         private readonly ?int $retryDelay = null,
         private readonly ?int $delay = null,
     ) {
@@ -34,6 +34,13 @@ class Options implements OptionsInterface
     public function getRetryCount(): ?int
     {
         return $this->retryCount;
+    }
+
+    public function decreaseRetryCount(): static
+    {
+        --$this->retryCount;
+
+        return $this;
     }
 
     public function getRetryDelay(): ?int
