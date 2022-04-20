@@ -12,6 +12,11 @@ use Swoole\Http\Server;
 
 class Queue implements QueueInterface
 {
+    /**
+     * @var WorkerData[]
+     */
+    private array $queue = [];
+
     public function __construct(private readonly Server $server, private readonly ConfigInterface $config)
     {
     }
@@ -22,24 +27,32 @@ class Queue implements QueueInterface
         ?OptionsInterface $options = null
     ): void {
         $workerData = new WorkerData($job, $data, $options);
-        if (!$this->checkWorkersAvailability()) {
-            $this->server->after(5000, function () use ($workerData) {
-                $this->server->task($workerData);
-            });
+        $worker = $this->checkWorkersAvailability();
+        if ($worker === false) {
+            $this->queue[] = $workerData;
+
+            $this->server->after(100, [$this, 'performQueue']);
+
             return;
         }
 
-        $this->server->task($workerData);
+        $this->server->task($workerData, $worker);
     }
 
-    public function checkWorkersAvailability(): bool
+    private function performQueue(): void
     {
-        $workers = $this->config->get('server.options.worker_num')
-            * $this->config->get('server.options.task_worker_num');
+        foreach ($this->queue as $workerData) {
+            $this->push($workerData->job, $workerData->data, $workerData->options);
+        }
+    }
 
-        for ($i = $workers - 1; $i >= 0; $i--) {
-            if ($this->server->getWorkerStatus($i) === \SWOOLE_WORKER_IDLE) {
-                return true;
+    public function checkWorkersAvailability(): int|bool
+    {
+        $workers = $this->config->get('server.options.worker_num') - 1;
+
+        for ($worker = $workers; $worker >= 0; $worker--) {
+            if ($this->server->getWorkerStatus($worker) === \SWOOLE_WORKER_IDLE) {
+                return $worker;
             }
         }
 
