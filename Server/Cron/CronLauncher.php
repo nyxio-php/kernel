@@ -42,25 +42,36 @@ class CronLauncher implements CronLauncherInterface
 
                 $this->server->after(
                     $this->calculateNextRunInMilliseconds($currentDate, $cron->getNextRunDate()),
-                    function () use ($job, $cron) {
-                        $workerData = new WorkerData($job);
-                        $this->server->task(
-                            $workerData,
-                            -1,
-                            function () use ($workerData, $cron) {
-                                $this->server->tick(
-                                    $this->calculateNextRunInMilliseconds(
-                                        currentDate: new \DateTime(),
-                                        nextRunDate: $cron->getNextRunDate()
-                                    ),
-                                    function () use ($workerData) {
-                                        $this->server->task($workerData);
-                                    }
-                                );
+                    function () use ($cron, $job) {
+                        $this->server->tick(
+                            $this->calculateNextRunInMilliseconds(new \DateTime(), $cron->getNextRunDate()),
+                            function () use ($job) {
+                                $this->server->task(new WorkerData($job));
                             }
                         );
                     }
                 );
+//                $this->server->after(
+//                    $this->calculateNextRunInMilliseconds($currentDate, $cron->getNextRunDate()),
+//                    function () use ($job, $cron) {
+//                        $workerData = new WorkerData($job);
+//                        $this->server->task(
+//                            $workerData,
+//                            -1,
+//                            function () use ($workerData, $cron) {
+//                                $this->server->tick(
+//                                    $this->calculateNextRunInMilliseconds(
+//                                        currentDate: new \DateTime(),
+//                                        nextRunDate: $cron->getNextRunDate()
+//                                    ),
+//                                    function () use ($workerData) {
+//                                        $this->server->task($workerData);
+//                                    }
+//                                );
+//                            }
+//                        );
+//                    }
+//                );
             } catch (\Throwable $exception) {
                 echo \sprintf(
                     'Cron job %s is not registered (%s)' . \PHP_EOL,
