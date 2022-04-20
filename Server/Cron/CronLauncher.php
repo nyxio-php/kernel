@@ -61,7 +61,13 @@ class CronLauncher implements CronLauncherInterface
                         );
                     }
                 );
-            } catch (\Throwable) {
+            } catch (\Throwable $exception) {
+                echo \sprintf(
+                    'Cron job %s is not registered (%s)' . \PHP_EOL,
+                    $job,
+                    $exception->getMessage()
+                );
+
                 continue;
             }
         }
