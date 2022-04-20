@@ -10,7 +10,6 @@ use Swoole\Http\Server;
 
 class WorkerStartEventHandler
 {
-    private bool $cronStarted = false;
 
     public function __construct(
         private readonly CronLauncherInterface $cronLauncher,
@@ -20,9 +19,8 @@ class WorkerStartEventHandler
 
     public function handle(Server $server, int $workerId): void
     {
-        if (!$this->cronStarted) {
+        if ($workerId === 0) {
             $this->cronLauncher->launch($this->config->get('cron.jobs'));
-            $this->cronStarted = true;
         }
     }
 }
