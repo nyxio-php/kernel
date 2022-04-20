@@ -88,6 +88,6 @@ class CronLauncher implements CronLauncherInterface
         \DateTimeInterface $currentDate,
         \DateTimeInterface $nextRunDate
     ): int {
-        return ($nextRunDate->getTimestamp() - $currentDate->getTimestamp()) * 100;
+        return ($nextRunDate->getTimestamp() - $currentDate->getTimestamp()) * 1000;
     }
 }
