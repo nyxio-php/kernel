@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Cron;
 
 use Cron\CronExpression;
-use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Helper\Attribute\ExtractAttribute;
 use Nyxio\Kernel\Server\Cron\Attribute\Cron;
 use Nyxio\Kernel\Server\Http\WorkerData;
@@ -13,20 +12,16 @@ use Swoole\Http\Server;
 
 class CronJob
 {
-    private array $jobs;
-
     public function __construct(
         private readonly Server $server,
-        private readonly ConfigInterface $config,
         private readonly ExtractAttribute $extractAttribute,
     ) {
-        $this->jobs = $this->config->get('cron.jobs');
     }
 
-    public function handle(): void
+    public function handle(array $jobs): void
     {
         $currentDate = new \DateTime();
-        foreach ($this->jobs as $job) {
+        foreach ($jobs as $job) {
             try {
                 $reflection = new \ReflectionClass($job);
                 $cronAttribute = $this->extractAttribute->first($reflection, Cron::class);
