@@ -31,9 +31,14 @@ class CronLauncher implements CronLauncherInterface
                     continue;
                 }
 
-                echo \sprintf('Cron job %s is registered (5s)' . \PHP_EOL, $job, $cronAttribute->expression);
-
                 $cron = new CronExpression($cronAttribute->expression);
+
+                echo \sprintf(
+                    'Cron job %s is registered | %s | next run: %s' . \PHP_EOL,
+                    $job,
+                    $cronAttribute->expression,
+                    $cron->getNextRunDate()->format('Y-m-d H:i:s')
+                );
 
                 $this->server->after(
                     $this->calculateNextRunInMilliseconds($currentDate, $cron->getNextRunDate()),
