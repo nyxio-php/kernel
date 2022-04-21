@@ -101,7 +101,7 @@ class TaskEventHandler
                     };
 
                     $workerData->options->getRetryDelay()
-                        ? $server->after($workerData->options->getRetryDelay() ?? 0, $retry)
+                        ? $server->after($workerData->options->getRetryDelay(), $retry)
                         : $retry();
                 }
             }

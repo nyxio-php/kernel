@@ -32,7 +32,7 @@ class Message implements MessageInterface
     {
         return \sprintf(
             'lang/%s.%s',
-            $language ?? $this->config->get('app.lang', static::DEFAULT_LANG),
+            $language ?? $this->config->get('app.lang', self::DEFAULT_LANG),
             $message
         );
     }
