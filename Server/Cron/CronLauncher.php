@@ -35,7 +35,7 @@ class CronLauncher implements CronLauncherInterface
 
                 $reflection = new \ReflectionClass($job);
 
-                if ($reflection->implementsInterface(CronInterface::class)) {
+                if (!$reflection->implementsInterface(CronInterface::class)) {
                     continue;
                 }
 
