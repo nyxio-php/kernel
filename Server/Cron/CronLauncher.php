@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Cron;
 
 use Cron\CronExpression;
+use Nyxio\Contract\Kernel\Server\CronInterface;
 use Nyxio\Contract\Kernel\Server\CronLauncherInterface;
 use Nyxio\Helper\Attribute\ExtractAttribute;
 use Nyxio\Kernel\Server\Cron\Attribute\Cron;
@@ -33,6 +34,11 @@ class CronLauncher implements CronLauncherInterface
                 }
 
                 $reflection = new \ReflectionClass($job);
+
+                if ($reflection->implementsInterface(CronInterface::class)) {
+                    continue;
+                }
+
                 $cronAttribute = $this->extractAttribute->first($reflection, Cron::class);
 
                 if (!$cronAttribute instanceof Cron) {
