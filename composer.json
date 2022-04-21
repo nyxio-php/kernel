@@ -19,14 +19,14 @@
         "php": ">=8.1",
         "dragonmantank/cron-expression": "^3.3",
         "ext-openswoole": "*",
-        "nyxio/contract": "^1.1",
-        "nyxio/http": "^1.1",
-        "nyxio/provider": "^1.1",
-        "nyxio/event": "^1.1",
-        "nyxio/routing": "^1.1",
-        "nyxio/validation": "^1.1",
-        "nyxio/helper": "^1.1",
-        "nyxio/config": "^1.1",
-        "nyxio/container": "^1.1"
+        "nyxio/contract": "^1.2",
+        "nyxio/http": "^1.2",
+        "nyxio/provider": "^1.2",
+        "nyxio/event": "^1.2",
+        "nyxio/routing": "^1.2",
+        "nyxio/validation": "^1.2",
+        "nyxio/helper": "^1.2",
+        "nyxio/config": "^1.2",
+        "nyxio/container": "^1.2"
     }
 }
