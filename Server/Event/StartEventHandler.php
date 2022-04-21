@@ -32,7 +32,8 @@ class StartEventHandler
             echo \sprintf(" %s \e[1m\033[92m%s\033[0m" . \PHP_EOL, $key, $option);
         }
 
-        echo "------------------------------\e[7mApplication settings\e[0m-------------------------------------------" . \PHP_EOL;
+        echo "------------------------------\e[7mApplication settings\e[0m"
+            . "-------------------------------------------" . \PHP_EOL;
         echo sprintf(
             "* Debug mode: \e[1m%s\033[0m" . \PHP_EOL,
             $this->config->get('app.debug', false) ? "\033[91mYes" : "\033[92mNo"
@@ -51,6 +52,7 @@ class StartEventHandler
             "* Loaded http actions: \e[1m\033[92m%d\033[0m" . \PHP_EOL,
             count($this->config->get('http.actions', []))
         );
-        echo "---------------------------------------------------------------------------------------------" . \PHP_EOL;
+        echo "----------------------------------------------"
+            . "-----------------------------------------------" . \PHP_EOL;
     }
 }

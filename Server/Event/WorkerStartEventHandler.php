@@ -13,7 +13,6 @@ use Swoole\Http\Server;
  */
 class WorkerStartEventHandler
 {
-
     public function __construct(
         private readonly CronLauncherInterface $cronLauncher,
         private readonly ConfigInterface $config

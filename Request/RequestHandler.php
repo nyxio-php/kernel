@@ -137,16 +137,25 @@ class RequestHandler implements RequestHandlerInterface
             return $this->performMiddlewares($request, $response, $middlewares, $action);
         }
 
-        return $middleware->handle($request, $response, function (
-            ?Request $nextRequest = null,
-            ?Response $nextResponse = null
-        ) use ($middlewares, $action, $request, $response) {
-            return $this->performMiddlewares(
-                request:     $nextRequest ?? $request,
-                response:    $nextResponse ?? $response,
-                middlewares: $middlewares,
-                action:      $action
-            );
-        });
+        return $middleware->handle(
+            $request,
+            $response,
+            function (
+                ?Request $nextRequest = null,
+                ?Response $nextResponse = null,
+            ) use (
+                $middlewares,
+                $action,
+                $request,
+                $response
+            ) {
+                return $this->performMiddlewares(
+                    request:     $nextRequest ?? $request,
+                    response:    $nextResponse ?? $response,
+                    middlewares: $middlewares,
+                    action:      $action
+                );
+            }
+        );
     }
 }
