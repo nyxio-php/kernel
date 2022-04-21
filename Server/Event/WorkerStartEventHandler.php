@@ -22,7 +22,7 @@ class WorkerStartEventHandler
     public function handle(Server $server, int $workerId): void
     {
         if ($workerId === 0) {
-            $this->cronLauncher->launch($this->config->get('cron.jobs'));
+            $this->cronLauncher->launch($this->config->get('cron.jobs', []));
         }
     }
 }
