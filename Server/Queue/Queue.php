@@ -35,6 +35,7 @@ class Queue implements QueueInterface
             return;
         }
 
+        /** @psalm-suppress InvalidArgument  */
         $this->server->task(new WorkerData($job, $data, $options), $workerId, $finishCallback);
     }
 

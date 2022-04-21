@@ -28,6 +28,10 @@ class TaskEventHandler
     public function handle(Server $server, int $taskId, int $reactorId, WorkerData $workerData): void
     {
         try {
+            if (!\class_exists($workerData->job)) {
+                throw new \ReflectionException(\sprintf('Class %s doesn\'t exists', $workerData->job));
+            }
+
             $job = $this->container->get($workerData->job);
 
             $reflection = new \ReflectionClass($workerData->job);
@@ -38,14 +42,19 @@ class TaskEventHandler
 
             $handle = $reflection->getMethod('handle');
 
+            if ($workerData->options instanceof OptionsInterface) {
+                $delay = $workerData->options->getDelay();
 
-            if ($workerData->options instanceof OptionsInterface && $workerData->options->getDelay()) {
-                $server->after($workerData->options->getDelay(), function () use ($server, $job, $handle, $workerData) {
-                    $this->execute($server, $job, $handle, $workerData);
-                });
-            } else {
-                $this->execute($server, $job, $handle, $workerData);
+                if ($delay !== null) {
+                    $server->after($delay, function () use ($server, $job, $handle, $workerData): void {
+                        $this->execute($server, $job, $handle, $workerData);
+                    });
+
+                    return;
+                }
             }
+
+            $this->execute($server, $job, $handle, $workerData);
         } catch (\Throwable $exception) {
             if ($workerData->isCronJob) {
                 $this->eventDispatcher->dispatch(CronJobError::NAME, new CronJobError($workerData->job, $exception));
@@ -64,6 +73,7 @@ class TaskEventHandler
         try {
             $handle->invokeArgs($job, $workerData->data);
 
+            /** @psalm-suppress InvalidArgument  */
             $server->finish($workerData);
 
             if ($workerData->isCronJob) {
@@ -84,7 +94,7 @@ class TaskEventHandler
                 }
 
                 if ($workerData->options->getRetryCount() > 0) {
-                    $retry = function () use ($server, $job, $handle, $workerData) {
+                    $retry = function () use ($server, $job, $handle, $workerData): void {
                         $workerData->options->decreaseRetryCount();
 
                         $this->execute($server, $job, $handle, $workerData);

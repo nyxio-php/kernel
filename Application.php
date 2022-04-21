@@ -23,7 +23,7 @@ class Application
     }
 
     /**
-     * @return Application
+     * @return static
      * @throws \ReflectionException
      */
     public function bootstrap(): static

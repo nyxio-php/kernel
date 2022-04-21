@@ -28,6 +28,10 @@ class CronLauncher implements CronLauncherInterface
 
         foreach ($jobs as $job) {
             try {
+                if (!\class_exists($job)) {
+                    throw new \ReflectionException(\sprintf('Class %s doesn\'t exists', $job));
+                }
+
                 $reflection = new \ReflectionClass($job);
                 $cronAttribute = $this->extractAttribute->first($reflection, Cron::class);
 
@@ -49,6 +53,7 @@ class CronLauncher implements CronLauncherInterface
                         $this->server->tick(
                             $this->calculateNextRunInMilliseconds(new \DateTime(), $cron->getNextRunDate()),
                             function () use ($job) {
+                                /** @psalm-suppress InvalidArgument */
                                 $this->server->task(new WorkerData($job, isCronJob: true));
                             }
                         );
