@@ -2,41 +2,40 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Queue;
+namespace Nyxio\Kernel\Server\Job;
 
 use Nyxio\Contract\Config\ConfigInterface;
-use Nyxio\Contract\Queue\OptionsInterface;
-use Nyxio\Contract\Queue\QueueInterface;
-use Nyxio\Kernel\Server\WorkerData;
+use Nyxio\Contract\Kernel\Server\Job\DispatcherInterface;
+use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
 use Swoole\Http\Server;
 
 /**
  * @codeCoverageIgnore
  */
-class Queue implements QueueInterface
+class Dispatcher implements DispatcherInterface
 {
     public function __construct(private readonly Server $server, private readonly ConfigInterface $config)
     {
     }
 
-    public function push(
-        string $job,
-        array $data = [],
-        ?OptionsInterface $options = null,
-        \Closure $finishCallback = null,
-    ): void {
+    public function dispatch(TaskData $taskData): void
+    {
         $workerId = $this->getIdleWorkerId();
 
         if ($workerId === -1) {
-            $this->server->defer(function () use ($job, $data, $options, $finishCallback) {
-                $this->push($job, $data, $options, $finishCallback);
+            $this->server->defer(function () use ($taskData) {
+                $this->dispatch($taskData);
             });
 
             return;
         }
 
-        /** @psalm-suppress InvalidArgument  */
-        $this->server->task(new WorkerData($job, $data, $options), $workerId, $finishCallback);
+        /** @psalm-suppress InvalidArgument */
+        $this->server->task(
+            $taskData,
+            $workerId,
+            $taskData->options instanceof OptionsInterface ? $taskData->options->getFinishCallback() : null,
+        );
     }
 
     public function getIdleWorkerId(): int

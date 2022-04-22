@@ -92,7 +92,10 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         $this->container->singleton(Contract\Provider\ProviderDispatcherInterface::class, Provider\Dispatcher::class);
         $this->container->singleton(Contract\Event\EventDispatcherInterface::class, Event\Dispatcher::class);
         $this->container->singleton(Contract\Kernel\Text\MessageInterface::class, Kernel\Text\Message::class);
-        $this->container->singleton(Contract\Queue\QueueInterface::class, Kernel\Server\Queue\Queue::class);
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\DispatcherInterface::class,
+            Kernel\Server\Job\Dispatcher::class
+        );
     }
 
     private function bootstrap(): void
@@ -123,8 +126,18 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         });
 
         $this->container->singleton(
-            Contract\Kernel\Server\CronLauncherInterface::class,
-            Kernel\Server\Cron\CronLauncher::class
+            Contract\Kernel\Server\Job\Queue\QueueInterface::class,
+            Kernel\Server\Job\Queue\Queue::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\DispatcherInterface::class,
+            Kernel\Server\Job\Dispatcher::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Schedule\ScheduleDispatcherInterface::class,
+            Kernel\Server\Job\Schedule\ScheduleDispatcher::class
         );
     }
 }

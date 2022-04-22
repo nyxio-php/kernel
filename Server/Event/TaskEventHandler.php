@@ -6,12 +6,11 @@ namespace Nyxio\Kernel\Server\Event;
 
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Event\EventDispatcherInterface;
-use Nyxio\Contract\Queue\OptionsInterface;
-use Nyxio\Kernel\Event\CronJobCompleted;
-use Nyxio\Kernel\Event\CronJobError;
-use Nyxio\Kernel\Event\JobCompleted;
-use Nyxio\Kernel\Event\JobError;
-use Nyxio\Kernel\Server\WorkerData;
+use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
+use Nyxio\Kernel\Event\QueueException;
+use Nyxio\Kernel\Event\ScheduleException;
+use Nyxio\Kernel\Server\Job\JobType;
+use Nyxio\Kernel\Server\Job\TaskData;
 use Swoole\Http\Server;
 
 /**
@@ -25,86 +24,103 @@ class TaskEventHandler
     ) {
     }
 
-    public function handle(Server $server, int $taskId, int $reactorId, WorkerData $workerData): void
+    public function handle(Server $server, int $taskId, int $reactorId, TaskData $taskData): void
     {
         try {
-            if (!\class_exists($workerData->job)) {
-                throw new \ReflectionException(\sprintf('Class %s doesn\'t exists', $workerData->job));
-            }
+            $this->dispatch($server, $taskData);
+        } catch (\Throwable $exception) {
+            $this->catchException($exception, $taskData);
+        }
+    }
 
-            $job = $this->container->get($workerData->job);
+    private function dispatch(Server $server, TaskData $taskData, bool $isRetry = false): void
+    {
+        try {
+            $job = $this->container->get($taskData->job);
 
-            $reflection = new \ReflectionClass($workerData->job);
+            $reflection = new \ReflectionClass($taskData->job);
 
             if (!$reflection->hasMethod('handle')) {
-                throw new \RuntimeException(\sprintf("Job %s doesn't have `handle` method", $workerData->job));
+                throw new \RuntimeException(
+                    \sprintf("Job %s (%s) doesn't have `handle` method", $taskData->job, $taskData->uuid)
+                );
             }
 
             $handle = $reflection->getMethod('handle');
 
-            if ($workerData->options instanceof OptionsInterface) {
-                $delay = $workerData->options->getDelay();
+            if (
+                $isRetry === false
+                && ($taskData->options instanceof OptionsInterface)
+                && $taskData->options->getDelay() !== null
+            ) {
+                $server->after(
+                    $taskData->options->getDelay(),
+                    function () use ($job, $taskData, $handle, $server) {
+                        $this->invoke($server, $handle, $job, $taskData);
+                    }
+                );
 
-                if ($delay !== null) {
-                    $server->after($delay, function () use ($server, $job, $handle, $workerData): void {
-                        $this->execute($server, $job, $handle, $workerData);
-                    });
-
-                    return;
-                }
+                return;
             }
 
-            $this->execute($server, $job, $handle, $workerData);
+            $this->invoke($server, $handle, $job, $taskData);
         } catch (\Throwable $exception) {
-            if ($workerData->isCronJob) {
-                $this->eventDispatcher->dispatch(CronJobError::NAME, new CronJobError($workerData->job, $exception));
-            } else {
-                $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
-            }
+            $this->retry($server, $taskData, $exception);
         }
     }
 
-    protected function execute(
-        Server $server,
-        object $job,
-        \ReflectionMethod $handle,
-        WorkerData $workerData
-    ): void {
+    private function invoke(Server $server, \ReflectionMethod $handle, object $job, TaskData $taskData): void
+    {
         try {
-            $handle->invokeArgs($job, $workerData->data);
-
-            /** @psalm-suppress InvalidArgument  */
-            $server->finish($workerData);
-
-            if ($workerData->isCronJob) {
-                $this->eventDispatcher->dispatch(CronJobCompleted::NAME, new CronJobCompleted($workerData->job));
-            } else {
-                $this->eventDispatcher->dispatch(JobCompleted::NAME, new JobCompleted($workerData->job));
-            }
+            $handle->invokeArgs($job, $taskData->data);
+            /** @psalm-suppress InvalidArgument */
+            $server->finish($taskData);
         } catch (\Throwable $exception) {
-            if ($workerData->isCronJob) {
-                $this->eventDispatcher->dispatch(CronJobError::NAME, new CronJobError($workerData->job, $exception));
-            } else {
-                $this->eventDispatcher->dispatch(JobError::NAME, new JobError($workerData->job, $exception));
+            $this->retry($server, $taskData, $exception);
+        }
+    }
+
+    private function retry(Server $server, TaskData $taskData, \Throwable $exception): void
+    {
+        if (
+            ($taskData->options instanceof OptionsInterface)
+            && $taskData->options->getRetryCount() !== null
+            && $taskData->options->getRetryCount() > 0
+        ) {
+            $taskData->options->decreaseRetryCount();
+
+            if ($taskData->options->getRetryDelay() !== null) {
+                $server->after($taskData->options->getRetryDelay(), function () use ($server, $taskData) {
+                    $this->dispatch($server, $taskData, isRetry: true);
+                });
+
+                return;
             }
 
-            if ($workerData->options instanceof OptionsInterface) {
-                if ($workerData->options->getRetryCount() === null) {
-                    return;
-                }
+            $this->dispatch($server, $taskData, isRetry: true);
 
-                if ($workerData->options->getRetryCount() > 0) {
-                    $retry = function () use ($server, $job, $handle, $workerData): void {
-                        $workerData->options->decreaseRetryCount();
+            return;
+        }
 
-                        $this->execute($server, $job, $handle, $workerData);
-                    };
+        $this->catchException($exception, $taskData);
+    }
 
-                    $workerData->options->getRetryDelay()
-                        ? $server->after($workerData->options->getRetryDelay(), $retry)
-                        : $retry();
-                }
-            }
+
+    private function catchException(\Throwable $exception, TaskData $taskData): void
+    {
+        switch ($taskData->type) {
+            case JobType::Queue:
+                $this->eventDispatcher->dispatch(
+                    QueueException::NAME,
+                    new QueueException($taskData, $exception)
+                );
+                break;
+            case JobType::Scheduled:
+                $this->eventDispatcher->dispatch(
+                    ScheduleException::NAME,
+                    new ScheduleException($taskData, $exception)
+                );
+                break;
         }
     }
 }

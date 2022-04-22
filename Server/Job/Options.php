@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Queue;
+namespace Nyxio\Kernel\Server\Job;
 
-use Nyxio\Contract\Queue\OptionsInterface;
+use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
 
 class Options implements OptionsInterface
 {
@@ -12,6 +12,7 @@ class Options implements OptionsInterface
         private ?int $retryCount = null,
         private readonly ?int $retryDelay = null,
         private readonly ?int $delay = null,
+        private readonly ?\Closure $finishCallback = null,
     ) {
         if ($this->delay !== null && $this->delay <= 0) {
             throw new \InvalidArgumentException('Delay cannot be less or equals zero');
@@ -24,6 +25,11 @@ class Options implements OptionsInterface
         if ($this->retryCount !== null && $this->retryCount < 0) {
             throw new \InvalidArgumentException('Retry delay cannot be less than zero');
         }
+    }
+
+    public function getFinishCallback(): ?\Closure
+    {
+        return $this->finishCallback;
     }
 
     public function getDelay(): ?int

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Cron\Attribute;
+namespace Nyxio\Kernel\Server\Job\Schedule\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class Cron
+class Schedule
 {
     public function __construct(public readonly string $expression)
     {
