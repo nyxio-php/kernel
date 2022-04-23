@@ -8,11 +8,11 @@ use Cron\CronExpression;
 use Nyxio\Contract\Kernel\Server\Job\DispatcherInterface;
 use Nyxio\Contract\Kernel\Server\Job\Schedule\ScheduleDispatcherInterface;
 use Nyxio\Contract\Kernel\Server\Job\Schedule\ScheduledJobInterface;
+use Nyxio\Contract\Kernel\Utility\UuidFactoryInterface;
 use Nyxio\Helper\Attribute\ExtractAttribute;
 use Nyxio\Kernel\Server\Job\JobType;
 use Nyxio\Kernel\Server\Job\Schedule\Attribute\Schedule;
 use Nyxio\Kernel\Server\Job\TaskData;
-use Ramsey\Uuid\Uuid;
 use Swoole\Http\Server;
 
 /**
@@ -24,6 +24,7 @@ class ScheduleDispatcher implements ScheduleDispatcherInterface
         private readonly Server $server,
         private readonly ExtractAttribute $extractAttribute,
         private readonly DispatcherInterface $dispatcher,
+        private readonly UuidFactoryInterface $uuidFactory,
     ) {
     }
 
@@ -67,7 +68,7 @@ class ScheduleDispatcher implements ScheduleDispatcherInterface
                                 $this->dispatcher->dispatch(
                                     new TaskData(
                                         job: $job,
-                                        uuid: Uuid::uuid4()->toString(),
+                                        uuid: $this->uuidFactory->generate(),
                                         type: JobType::Scheduled
                                     )
                                 );

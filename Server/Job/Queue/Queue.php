@@ -7,14 +7,16 @@ namespace Nyxio\Kernel\Server\Job\Queue;
 use Nyxio\Contract\Kernel\Server\Job\DispatcherInterface;
 use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
 use Nyxio\Contract\Kernel\Server\Job\Queue\QueueInterface;
+use Nyxio\Contract\Kernel\Utility\UuidFactoryInterface;
 use Nyxio\Kernel\Server\Job\JobType;
 use Nyxio\Kernel\Server\Job\TaskData;
-use Ramsey\Uuid\Uuid;
 
 class Queue implements QueueInterface
 {
-    public function __construct(private readonly DispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private readonly DispatcherInterface $dispatcher,
+        private readonly UuidFactoryInterface $uuidFactory,
+    ) {
     }
 
     public function push(string $job, array $data = [], ?OptionsInterface $options = null): void
@@ -22,7 +24,7 @@ class Queue implements QueueInterface
         $this->dispatcher->dispatch(
             new TaskData(
                 job:     $job,
-                uuid:    Uuid::uuid4()->toString(),
+                uuid:    $this->uuidFactory->generate(),
                 type:    JobType::Queue,
                 data:    $data,
                 options: $options

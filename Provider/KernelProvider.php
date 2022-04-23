@@ -96,6 +96,11 @@ class KernelProvider implements Contract\Provider\ProviderInterface
             Contract\Kernel\Server\Job\DispatcherInterface::class,
             Kernel\Server\Job\Dispatcher::class
         );
+
+        $this->container->singleton(
+            Contract\Kernel\Utility\UuidFactoryInterface::class,
+            Kernel\Utility\UuidFactory::class
+        );
     }
 
     private function bootstrap(): void

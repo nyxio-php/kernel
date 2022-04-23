@@ -11,7 +11,7 @@ use Nyxio\Contract\Config\ConfigInterface;
  */
 class StartEventHandler
 {
-    public function __construct(private readonly ConfigInterface $config,)
+    public function __construct(private readonly ConfigInterface $config)
     {
     }
 

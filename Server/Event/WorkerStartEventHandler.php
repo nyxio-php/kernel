@@ -15,7 +15,7 @@ class WorkerStartEventHandler
 {
     public function __construct(
         private readonly ScheduleDispatcherInterface $scheduleDispatcher,
-        private readonly ConfigInterface $config
+        private readonly ConfigInterface $config,
     ) {
     }
 
