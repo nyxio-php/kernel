@@ -30,7 +30,6 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         $this->routing();
         $this->validation();
         $this->server();
-
         $this->bootstrap();
     }
 
@@ -105,9 +104,8 @@ class KernelProvider implements Contract\Provider\ProviderInterface
 
     private function bootstrap(): void
     {
-        $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)->register(
-            Validation\Helper\DefaultRules::class
-        );
+        $this->container->get(Contract\Validation\RuleExecutorCollectionInterface::class)
+            ->register(Validation\Helper\DefaultRules::class);
 
         foreach ($this->config->get('http.groups', []) as $group) {
             $this->container->get(Contract\Routing\GroupCollectionInterface::class)->register($group);
@@ -131,18 +129,70 @@ class KernelProvider implements Contract\Provider\ProviderInterface
         });
 
         $this->container->singleton(
-            Contract\Kernel\Server\Job\Queue\QueueInterface::class,
-            Kernel\Server\Job\Queue\Queue::class
-        );
-
-        $this->container->singleton(
             Contract\Kernel\Server\Job\DispatcherInterface::class,
             Kernel\Server\Job\Dispatcher::class
         );
 
         $this->container->singleton(
-            Contract\Kernel\Server\Job\Schedule\ScheduleDispatcherInterface::class,
-            Kernel\Server\Job\Schedule\ScheduleDispatcher::class
+            Contract\Kernel\Server\Job\Await\AwaitTaskInterface::class,
+            Kernel\Server\Job\Await\AwaitTask::class
         );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Async\Queue\QueueInterface::class,
+            Kernel\Server\Job\Async\Queue\Queue::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Async\Schedule\ScheduleDispatcherInterface::class,
+            Kernel\Server\Job\Async\Schedule\ScheduleDispatcher::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Await\TaskHandlerInterface::class,
+            Kernel\Server\Job\Await\TaskHandler::class,
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Async\TaskHandlerInterface::class,
+            Kernel\Server\Job\Async\TaskHandler::class,
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Pool\ConnectionPoolProviderInterface::class,
+            Kernel\Server\Job\Pool\ConnectionPoolProvider::class,
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Job\Pool\ConnectionPoolInterface::class,
+            Kernel\Server\Job\Pool\ConnectionPool::class,
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Event\StartHandlerInterface::class,
+            Kernel\Server\Event\StartHandler::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Event\RequestHandlerInterface::class,
+            Kernel\Server\Event\RequestHandler::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Event\TaskHandlerInterface::class,
+            Kernel\Server\Event\TaskHandler::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Event\FinishHandlerInterface::class,
+            Kernel\Server\Event\FinishHandler::class
+        );
+
+        $this->container->singleton(
+            Contract\Kernel\Server\Event\WorkerStartHandlerInterface::class,
+            Kernel\Server\Event\WorkerStartHandler::class
+        );
+
+        $this->container->singleton(Kernel\Server\Starter::class);
     }
 }

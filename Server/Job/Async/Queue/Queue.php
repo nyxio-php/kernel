@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Job\Queue;
+namespace Nyxio\Kernel\Server\Job\Async\Queue;
 
+use Nyxio\Contract\Kernel\Server\Job\Async\OptionsInterface;
+use Nyxio\Contract\Kernel\Server\Job\Async\Queue\QueueInterface;
 use Nyxio\Contract\Kernel\Server\Job\DispatcherInterface;
-use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
-use Nyxio\Contract\Kernel\Server\Job\Queue\QueueInterface;
 use Nyxio\Contract\Kernel\Utility\UuidFactoryInterface;
-use Nyxio\Kernel\Server\Job\JobType;
 use Nyxio\Kernel\Server\Job\TaskData;
+use Nyxio\Kernel\Server\Job\TaskType;
 
 class Queue implements QueueInterface
 {
@@ -25,7 +25,7 @@ class Queue implements QueueInterface
             new TaskData(
                 job:     $job,
                 uuid:    $this->uuidFactory->generate(),
-                type:    JobType::Queue,
+                type:    TaskType::Queue,
                 data:    $data,
                 options: $options
             )

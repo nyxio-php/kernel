@@ -9,6 +9,7 @@ use Nyxio\Container\Container;
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
+use Nyxio\Kernel\Server\Starter;
 use Nyxio\Provider\Dispatcher;
 use Swoole\Http\Server;
 
@@ -34,19 +35,18 @@ class Application
     }
 
     /**
-     * @return void
+     * @return bool
      * @throws \ReflectionException
-     * @codeCoverageIgnore
      */
-    public function start(): void
+    public function start(): bool
     {
-        $server = $this->container->get(Server::class);
+        $starter = $this->container->get(Starter::class);
 
-        if (!$server instanceof Server) {
-            throw new \RuntimeException(\sprintf('%s was not specified', Server::class));
+        if (!$starter instanceof Starter) {
+            throw new \RuntimeException(\sprintf('%s was not specified', Starter::class));
         }
 
-        $server->start();
+        return $starter->start();
     }
 
     /**

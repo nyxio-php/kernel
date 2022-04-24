@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Nyxio\Kernel\Server\Event;
 
 use Nyxio\Contract\Config\ConfigInterface;
-use Nyxio\Contract\Kernel\Server\Job\Schedule\ScheduleDispatcherInterface;
+use Nyxio\Contract\Kernel\Server\Event\WorkerStartHandlerInterface;
+use Nyxio\Contract\Kernel\Server\Job\Async\Schedule\ScheduleDispatcherInterface;
 use Swoole\Http\Server;
 
-/**
- * @codeCoverageIgnore
- */
-class WorkerStartEventHandler
+class WorkerStartHandler implements WorkerStartHandlerInterface
 {
     public function __construct(
         private readonly ScheduleDispatcherInterface $scheduleDispatcher,

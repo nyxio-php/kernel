@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nyxio\Kernel\Server\Job\Schedule\Attribute;
+namespace Nyxio\Kernel\Server\Job\Async\Schedule\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Schedule

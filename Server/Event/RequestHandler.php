@@ -9,7 +9,7 @@ use Nyxio\Contract\Http\ContentType;
 use Nyxio\Contract\Http\HttpStatus;
 use Nyxio\Contract\Http\Method;
 use Nyxio\Contract\Kernel\Exception\Transformer\ExceptionTransformerInterface;
-use Nyxio\Contract\Kernel\Request\RequestHandlerInterface;
+use Nyxio\Contract\Kernel\Server\Event\RequestHandlerInterface;
 use Nyxio\Http\Exception\HttpException;
 use Nyxio\Kernel\Event\ResponseEvent;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -17,13 +17,10 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Http\Response;
 
-/**
- * @codeCoverageIgnore
- */
-class RequestEventHandler
+class RequestHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private readonly RequestHandlerInterface $requestHandler,
+        private readonly \Nyxio\Contract\Kernel\Request\RequestHandlerInterface $requestHandler,
         private readonly ServerRequestFactoryInterface $requestFactory,
         private readonly ExceptionTransformerInterface $exceptionTransformer,
         private readonly ResponseFactoryInterface $responseFactory,

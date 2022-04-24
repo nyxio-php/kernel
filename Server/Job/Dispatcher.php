@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Nyxio\Kernel\Server\Job;
 
-use Nyxio\Contract\Config\ConfigInterface;
+use Nyxio\Contract\Kernel\Server\Job\Async;
+use Nyxio\Contract\Kernel\Server\Job\Await;
 use Nyxio\Contract\Kernel\Server\Job\DispatcherInterface;
-use Nyxio\Contract\Kernel\Server\Job\OptionsInterface;
+use Swoole\Constant;
 use Swoole\Http\Server;
 
-/**
- * @codeCoverageIgnore
- */
 class Dispatcher implements DispatcherInterface
 {
-    public function __construct(private readonly Server $server, private readonly ConfigInterface $config)
+    public function __construct(private readonly Server $server)
     {
     }
 
-    public function dispatch(TaskData $taskData): void
+    public function dispatch(TaskData $taskData): mixed
     {
         $workerId = $this->getIdleWorkerId();
 
@@ -27,22 +25,46 @@ class Dispatcher implements DispatcherInterface
                 $this->dispatch($taskData);
             });
 
-            return;
+            return null;
+        }
+
+        if ($taskData->isAsync()) {
+            $finishCallback = null;
+
+            if ($taskData->options instanceof Async\OptionsInterface) {
+                $finishCallback = $taskData->options->getFinishCallback();
+                $taskData->options->resetFinishCallback();
+            }
+
+            /** @psalm-suppress InvalidArgument */
+            $this->server->task(
+                $taskData,
+                $workerId,
+                $finishCallback,
+            );
+
+            return null;
         }
 
         /** @psalm-suppress InvalidArgument */
-        $this->server->task(
+        return $this->server->taskwait(
             $taskData,
-            $workerId,
-            $taskData->options instanceof OptionsInterface ? $taskData->options->getFinishCallback() : null,
+            $taskData->options instanceof Await\OptionsInterface ? $taskData->options->getTimeout() : 0.5,
+            $workerId
         );
     }
 
     public function getIdleWorkerId(): int
     {
-        $workers = $this->config->get('server.options.task_worker_num');
+        /** @psalm-suppress UndefinedClass Constant */
+        $workers = $this->server->setting[Constant::OPTION_WORKER_NUM] ?? null;
+
+        if ($workers === null) {
+            return -1;
+        }
 
         $idleWorkersIds = [];
+
         for ($workerId = $workers - 1; $workerId >= 0; $workerId--) {
             if ($this->server->getWorkerStatus($workerId) === \SWOOLE_WORKER_IDLE) {
                 $idleWorkersIds[] = $workerId;
