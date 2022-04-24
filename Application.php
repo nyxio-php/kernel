@@ -8,10 +8,11 @@ use Nyxio\Config\MemoryConfig;
 use Nyxio\Container\Container;
 use Nyxio\Contract\Config\ConfigInterface;
 use Nyxio\Contract\Container\ContainerInterface;
+use Nyxio\Contract\Kernel\Request\ActionCollectionInterface;
 use Nyxio\Contract\Provider\ProviderDispatcherInterface;
+use Nyxio\Contract\Routing\GroupCollectionInterface;
 use Nyxio\Kernel\Server\Starter;
 use Nyxio\Provider\Dispatcher;
-use Swoole\Http\Server;
 
 class Application
 {
@@ -30,6 +31,7 @@ class Application
     public function bootstrap(): static
     {
         $this->dispatchProviders();
+        $this->httpBootstrap();
 
         return $this;
     }
@@ -62,5 +64,29 @@ class Application
         }
 
         $dispatcher->dispatch($this->config->get('app.providers', []));
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    private function httpBootstrap(): void
+    {
+        $groupCollection = $this->container->get(GroupCollectionInterface::class);
+        $actionCollection = $this->container->get(ActionCollectionInterface::class);
+
+        if (!$groupCollection instanceof GroupCollectionInterface) {
+            throw new \RuntimeException(\sprintf('%s was not specified', GroupCollectionInterface::class));
+        }
+
+        if (!$actionCollection instanceof ActionCollectionInterface) {
+            throw new \RuntimeException(\sprintf('%s was not specified', ActionCollectionInterface::class));
+        }
+
+        foreach ($this->config->get('http.groups', []) as $group) {
+            $groupCollection->register($group);
+        }
+
+        $actionCollection->create($this->config->get('http.actions', []));
     }
 }
